@@ -9,7 +9,7 @@ namespace Netatmo.Dashboard.Core.Models
         public string Uid { get; set; }
         public bool Enabled { get; set; }
         public string AccessToken { get; set; }
-        public DateTimeOffset ExpiresAt { get; set; }
+        public DateTime? ExpiresAt { get; set; }
         public string RefreshToken { get; set; }
         public List<Station> Stations { get; set; }
     }
