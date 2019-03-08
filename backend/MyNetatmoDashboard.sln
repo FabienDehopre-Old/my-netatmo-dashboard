@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netatmo.Dashboard.Data", "Netatmo.Dashboard.Data\Netatmo.Dashboard.Data.csproj", "{19B6116B-8EDE-40E3-A5D6-439654943312}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Netatmo.Dashboard.Data", "Netatmo.Dashboard.Data\Netatmo.Dashboard.Data.csproj", "{19B6116B-8EDE-40E3-A5D6-439654943312}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netatmo.Dashboard.Core", "Netatmo.Dashboard.Core\Netatmo.Dashboard.Core.csproj", "{B00B8A74-0204-4FB2-86E3-38767FE044C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Netatmo.Dashboard.Core", "Netatmo.Dashboard.Core\Netatmo.Dashboard.Core.csproj", "{B00B8A74-0204-4FB2-86E3-38767FE044C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netatmo.Dashboard.Api", "Netatmo.Dashboard.Api\Netatmo.Dashboard.Api.csproj", "{56F6CF76-73D5-4A01-9244-17783D1434BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{B00B8A74-0204-4FB2-86E3-38767FE044C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B00B8A74-0204-4FB2-86E3-38767FE044C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B00B8A74-0204-4FB2-86E3-38767FE044C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56F6CF76-73D5-4A01-9244-17783D1434BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56F6CF76-73D5-4A01-9244-17783D1434BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56F6CF76-73D5-4A01-9244-17783D1434BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56F6CF76-73D5-4A01-9244-17783D1434BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
