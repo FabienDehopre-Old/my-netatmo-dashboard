@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Netatmo.Dashboard.Core.Models
+namespace Netatmo.Dashboard.Api.Models
 {
     public class TemperatureData
     {

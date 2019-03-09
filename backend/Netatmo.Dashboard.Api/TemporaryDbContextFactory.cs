@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Netatmo.Dashboard.Data
+namespace Netatmo.Dashboard.Api
 {
     public class TemporaryDbContextFactory : DesignTimeDbContextFactoryBase<NetatmoDbContext>
     {

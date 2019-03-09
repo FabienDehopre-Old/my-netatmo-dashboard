@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Netatmo.Dashboard.Data.Migrations
+namespace Netatmo.Dashboard.Api.Migrations
 {
     public partial class InitialCreate : Migration
     {
@@ -17,7 +17,7 @@ namespace Netatmo.Dashboard.Data.Migrations
                     Uid = table.Column<string>(maxLength: 32, nullable: false),
                     Enabled = table.Column<bool>(nullable: false, defaultValue: false),
                     AccessToken = table.Column<string>(maxLength: 64, nullable: true),
-                    ExpiresAt = table.Column<DateTime>(nullable: false),
+                    ExpiresAt = table.Column<DateTime>(nullable: true),
                     RefreshToken = table.Column<string>(maxLength: 64, nullable: true)
                 },
                 constraints: table =>
@@ -38,7 +38,7 @@ namespace Netatmo.Dashboard.Data.Migrations
                     Location_GeoLocation_Latitude = table.Column<decimal>(nullable: false),
                     Location_GeoLocation_Longitude = table.Column<decimal>(nullable: false),
                     Location_Timezone = table.Column<string>(maxLength: 32, nullable: false),
-                    Location_StaticMap = table.Column<string>(nullable: true),
+                    Location_StaticMap = table.Column<string>(maxLength: 1024, nullable: true),
                     UserId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -147,6 +147,12 @@ namespace Netatmo.Dashboard.Data.Migrations
                 name: "IX_Stations_UserId",
                 table: "Stations",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Uid",
+                table: "Users",
+                column: "Uid",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Netatmo.Dashboard.Data;
+using Netatmo.Dashboard.Api;
 
-namespace Netatmo.Dashboard.Data.Migrations
+namespace Netatmo.Dashboard.Api.Migrations
 {
     [DbContext(typeof(NetatmoDbContext))]
-    partial class NetatmoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190309110934_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -19,7 +21,7 @@ namespace Netatmo.Dashboard.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.DashboardData", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.DashboardData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -41,7 +43,7 @@ namespace Netatmo.Dashboard.Data.Migrations
                     b.HasDiscriminator<string>("Discriminator").HasValue("DashboardData");
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.Device", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.Device", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -69,7 +71,7 @@ namespace Netatmo.Dashboard.Data.Migrations
                     b.HasDiscriminator<string>("Discriminator").HasValue("Device");
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.Station", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.Station", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -89,7 +91,7 @@ namespace Netatmo.Dashboard.Data.Migrations
                     b.ToTable("Stations");
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.User", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -116,12 +118,15 @@ namespace Netatmo.Dashboard.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Uid")
+                        .IsUnique();
+
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.IndoorDashboardData", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.IndoorDashboardData", b =>
                 {
-                    b.HasBaseType("Netatmo.Dashboard.Core.Models.DashboardData");
+                    b.HasBaseType("Netatmo.Dashboard.Api.Models.DashboardData");
 
                     b.Property<int>("CO2");
 
@@ -130,9 +135,9 @@ namespace Netatmo.Dashboard.Data.Migrations
                     b.HasDiscriminator().HasValue("IndoorDashboardData");
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.MainDashboardData", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.MainDashboardData", b =>
                 {
-                    b.HasBaseType("Netatmo.Dashboard.Core.Models.DashboardData");
+                    b.HasBaseType("Netatmo.Dashboard.Api.Models.DashboardData");
 
                     b.Property<int>("CO2")
                         .HasColumnName("MainDashboardData_CO2");
@@ -145,9 +150,9 @@ namespace Netatmo.Dashboard.Data.Migrations
                     b.HasDiscriminator().HasValue("MainDashboardData");
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.OutdoorDashboardData", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.OutdoorDashboardData", b =>
                 {
-                    b.HasBaseType("Netatmo.Dashboard.Core.Models.DashboardData");
+                    b.HasBaseType("Netatmo.Dashboard.Api.Models.DashboardData");
 
                     b.Property<int>("Humidity")
                         .HasColumnName("OutdoorDashboardData_Humidity");
@@ -155,9 +160,9 @@ namespace Netatmo.Dashboard.Data.Migrations
                     b.HasDiscriminator().HasValue("OutdoorDashboardData");
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.RainGaugeDashboardData", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.RainGaugeDashboardData", b =>
                 {
-                    b.HasBaseType("Netatmo.Dashboard.Core.Models.DashboardData");
+                    b.HasBaseType("Netatmo.Dashboard.Api.Models.DashboardData");
 
                     b.Property<decimal>("Rain");
 
@@ -168,9 +173,9 @@ namespace Netatmo.Dashboard.Data.Migrations
                     b.HasDiscriminator().HasValue("RainGaugeDashboardData");
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.WindGaugeDashboardData", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.WindGaugeDashboardData", b =>
                 {
-                    b.HasBaseType("Netatmo.Dashboard.Core.Models.DashboardData");
+                    b.HasBaseType("Netatmo.Dashboard.Api.Models.DashboardData");
 
                     b.Property<int>("GustAngle");
 
@@ -183,18 +188,18 @@ namespace Netatmo.Dashboard.Data.Migrations
                     b.HasDiscriminator().HasValue("WindGaugeDashboardData");
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.MainDevice", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.MainDevice", b =>
                 {
-                    b.HasBaseType("Netatmo.Dashboard.Core.Models.Device");
+                    b.HasBaseType("Netatmo.Dashboard.Api.Models.Device");
 
                     b.Property<int>("WifiStatus");
 
                     b.HasDiscriminator().HasValue("MainDevice");
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.ModuleDevice", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.ModuleDevice", b =>
                 {
-                    b.HasBaseType("Netatmo.Dashboard.Core.Models.Device");
+                    b.HasBaseType("Netatmo.Dashboard.Api.Models.Device");
 
                     b.Property<int>("RfStatus");
 
@@ -203,29 +208,29 @@ namespace Netatmo.Dashboard.Data.Migrations
                     b.HasDiscriminator().HasValue("ModuleDevice");
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.DashboardData", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.DashboardData", b =>
                 {
-                    b.HasOne("Netatmo.Dashboard.Core.Models.Device", "Device")
+                    b.HasOne("Netatmo.Dashboard.Api.Models.Device", "Device")
                         .WithMany("DashboardData")
                         .HasForeignKey("DeviceId");
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.Device", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.Device", b =>
                 {
-                    b.HasOne("Netatmo.Dashboard.Core.Models.Station", "Station")
+                    b.HasOne("Netatmo.Dashboard.Api.Models.Station", "Station")
                         .WithMany("Devices")
                         .HasForeignKey("StationId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.Station", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.Station", b =>
                 {
-                    b.HasOne("Netatmo.Dashboard.Core.Models.User", "User")
+                    b.HasOne("Netatmo.Dashboard.Api.Models.User", "User")
                         .WithMany("Stations")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.OwnsOne("Netatmo.Dashboard.Core.Models.Location", "Location", b1 =>
+                    b.OwnsOne("Netatmo.Dashboard.Api.Models.Location", "Location", b1 =>
                         {
                             b1.Property<int>("StationId")
                                 .ValueGeneratedOnAdd()
@@ -256,12 +261,12 @@ namespace Netatmo.Dashboard.Data.Migrations
 
                             b1.ToTable("Stations");
 
-                            b1.HasOne("Netatmo.Dashboard.Core.Models.Station")
+                            b1.HasOne("Netatmo.Dashboard.Api.Models.Station")
                                 .WithOne("Location")
-                                .HasForeignKey("Netatmo.Dashboard.Core.Models.Location", "StationId")
+                                .HasForeignKey("Netatmo.Dashboard.Api.Models.Location", "StationId")
                                 .OnDelete(DeleteBehavior.Cascade);
 
-                            b1.OwnsOne("Netatmo.Dashboard.Core.Models.GeoPoint", "GeoLocation", b2 =>
+                            b1.OwnsOne("Netatmo.Dashboard.Api.Models.GeoPoint", "GeoLocation", b2 =>
                                 {
                                     b2.Property<int>("LocationStationId")
                                         .ValueGeneratedOnAdd()
@@ -275,17 +280,17 @@ namespace Netatmo.Dashboard.Data.Migrations
 
                                     b2.ToTable("Stations");
 
-                                    b2.HasOne("Netatmo.Dashboard.Core.Models.Location")
+                                    b2.HasOne("Netatmo.Dashboard.Api.Models.Location")
                                         .WithOne("GeoLocation")
-                                        .HasForeignKey("Netatmo.Dashboard.Core.Models.GeoPoint", "LocationStationId")
+                                        .HasForeignKey("Netatmo.Dashboard.Api.Models.GeoPoint", "LocationStationId")
                                         .OnDelete(DeleteBehavior.Cascade);
                                 });
                         });
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.IndoorDashboardData", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.IndoorDashboardData", b =>
                 {
-                    b.OwnsOne("Netatmo.Dashboard.Core.Models.TemperatureData", "Temperature", b1 =>
+                    b.OwnsOne("Netatmo.Dashboard.Api.Models.TemperatureData", "Temperature", b1 =>
                         {
                             b1.Property<int>("IndoorDashboardDataId")
                                 .ValueGeneratedOnAdd()
@@ -299,12 +304,12 @@ namespace Netatmo.Dashboard.Data.Migrations
 
                             b1.ToTable("DashboardData");
 
-                            b1.HasOne("Netatmo.Dashboard.Core.Models.IndoorDashboardData")
+                            b1.HasOne("Netatmo.Dashboard.Api.Models.IndoorDashboardData")
                                 .WithOne("Temperature")
-                                .HasForeignKey("Netatmo.Dashboard.Core.Models.TemperatureData", "IndoorDashboardDataId")
+                                .HasForeignKey("Netatmo.Dashboard.Api.Models.TemperatureData", "IndoorDashboardDataId")
                                 .OnDelete(DeleteBehavior.Cascade);
 
-                            b1.OwnsOne("Netatmo.Dashboard.Core.Models.TemperatureMinMax", "Max", b2 =>
+                            b1.OwnsOne("Netatmo.Dashboard.Api.Models.TemperatureMinMax", "Max", b2 =>
                                 {
                                     b2.Property<int?>("TemperatureDataIndoorDashboardDataId")
                                         .ValueGeneratedOnAdd()
@@ -318,13 +323,13 @@ namespace Netatmo.Dashboard.Data.Migrations
 
                                     b2.ToTable("DashboardData");
 
-                                    b2.HasOne("Netatmo.Dashboard.Core.Models.TemperatureData")
+                                    b2.HasOne("Netatmo.Dashboard.Api.Models.TemperatureData")
                                         .WithOne("Max")
-                                        .HasForeignKey("Netatmo.Dashboard.Core.Models.TemperatureMinMax", "TemperatureDataIndoorDashboardDataId")
+                                        .HasForeignKey("Netatmo.Dashboard.Api.Models.TemperatureMinMax", "TemperatureDataIndoorDashboardDataId")
                                         .OnDelete(DeleteBehavior.Cascade);
                                 });
 
-                            b1.OwnsOne("Netatmo.Dashboard.Core.Models.TemperatureMinMax", "Min", b2 =>
+                            b1.OwnsOne("Netatmo.Dashboard.Api.Models.TemperatureMinMax", "Min", b2 =>
                                 {
                                     b2.Property<int?>("TemperatureDataIndoorDashboardDataId")
                                         .ValueGeneratedOnAdd()
@@ -338,17 +343,17 @@ namespace Netatmo.Dashboard.Data.Migrations
 
                                     b2.ToTable("DashboardData");
 
-                                    b2.HasOne("Netatmo.Dashboard.Core.Models.TemperatureData")
+                                    b2.HasOne("Netatmo.Dashboard.Api.Models.TemperatureData")
                                         .WithOne("Min")
-                                        .HasForeignKey("Netatmo.Dashboard.Core.Models.TemperatureMinMax", "TemperatureDataIndoorDashboardDataId")
+                                        .HasForeignKey("Netatmo.Dashboard.Api.Models.TemperatureMinMax", "TemperatureDataIndoorDashboardDataId")
                                         .OnDelete(DeleteBehavior.Cascade);
                                 });
                         });
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.MainDashboardData", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.MainDashboardData", b =>
                 {
-                    b.OwnsOne("Netatmo.Dashboard.Core.Models.PressureData", "Pressure", b1 =>
+                    b.OwnsOne("Netatmo.Dashboard.Api.Models.PressureData", "Pressure", b1 =>
                         {
                             b1.Property<int>("MainDashboardDataId")
                                 .ValueGeneratedOnAdd()
@@ -364,13 +369,13 @@ namespace Netatmo.Dashboard.Data.Migrations
 
                             b1.ToTable("DashboardData");
 
-                            b1.HasOne("Netatmo.Dashboard.Core.Models.MainDashboardData")
+                            b1.HasOne("Netatmo.Dashboard.Api.Models.MainDashboardData")
                                 .WithOne("Pressure")
-                                .HasForeignKey("Netatmo.Dashboard.Core.Models.PressureData", "MainDashboardDataId")
+                                .HasForeignKey("Netatmo.Dashboard.Api.Models.PressureData", "MainDashboardDataId")
                                 .OnDelete(DeleteBehavior.Cascade);
                         });
 
-                    b.OwnsOne("Netatmo.Dashboard.Core.Models.TemperatureData", "Temperature", b1 =>
+                    b.OwnsOne("Netatmo.Dashboard.Api.Models.TemperatureData", "Temperature", b1 =>
                         {
                             b1.Property<int>("MainDashboardDataId")
                                 .ValueGeneratedOnAdd()
@@ -386,12 +391,12 @@ namespace Netatmo.Dashboard.Data.Migrations
 
                             b1.ToTable("DashboardData");
 
-                            b1.HasOne("Netatmo.Dashboard.Core.Models.MainDashboardData")
+                            b1.HasOne("Netatmo.Dashboard.Api.Models.MainDashboardData")
                                 .WithOne("Temperature")
-                                .HasForeignKey("Netatmo.Dashboard.Core.Models.TemperatureData", "MainDashboardDataId")
+                                .HasForeignKey("Netatmo.Dashboard.Api.Models.TemperatureData", "MainDashboardDataId")
                                 .OnDelete(DeleteBehavior.Cascade);
 
-                            b1.OwnsOne("Netatmo.Dashboard.Core.Models.TemperatureMinMax", "Max", b2 =>
+                            b1.OwnsOne("Netatmo.Dashboard.Api.Models.TemperatureMinMax", "Max", b2 =>
                                 {
                                     b2.Property<int>("TemperatureDataMainDashboardDataId")
                                         .ValueGeneratedOnAdd()
@@ -407,13 +412,13 @@ namespace Netatmo.Dashboard.Data.Migrations
 
                                     b2.ToTable("DashboardData");
 
-                                    b2.HasOne("Netatmo.Dashboard.Core.Models.TemperatureData")
+                                    b2.HasOne("Netatmo.Dashboard.Api.Models.TemperatureData")
                                         .WithOne("Max")
-                                        .HasForeignKey("Netatmo.Dashboard.Core.Models.TemperatureMinMax", "TemperatureDataMainDashboardDataId")
+                                        .HasForeignKey("Netatmo.Dashboard.Api.Models.TemperatureMinMax", "TemperatureDataMainDashboardDataId")
                                         .OnDelete(DeleteBehavior.Cascade);
                                 });
 
-                            b1.OwnsOne("Netatmo.Dashboard.Core.Models.TemperatureMinMax", "Min", b2 =>
+                            b1.OwnsOne("Netatmo.Dashboard.Api.Models.TemperatureMinMax", "Min", b2 =>
                                 {
                                     b2.Property<int>("TemperatureDataMainDashboardDataId")
                                         .ValueGeneratedOnAdd()
@@ -429,17 +434,17 @@ namespace Netatmo.Dashboard.Data.Migrations
 
                                     b2.ToTable("DashboardData");
 
-                                    b2.HasOne("Netatmo.Dashboard.Core.Models.TemperatureData")
+                                    b2.HasOne("Netatmo.Dashboard.Api.Models.TemperatureData")
                                         .WithOne("Min")
-                                        .HasForeignKey("Netatmo.Dashboard.Core.Models.TemperatureMinMax", "TemperatureDataMainDashboardDataId")
+                                        .HasForeignKey("Netatmo.Dashboard.Api.Models.TemperatureMinMax", "TemperatureDataMainDashboardDataId")
                                         .OnDelete(DeleteBehavior.Cascade);
                                 });
                         });
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.OutdoorDashboardData", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.OutdoorDashboardData", b =>
                 {
-                    b.OwnsOne("Netatmo.Dashboard.Core.Models.TemperatureData", "Temperature", b1 =>
+                    b.OwnsOne("Netatmo.Dashboard.Api.Models.TemperatureData", "Temperature", b1 =>
                         {
                             b1.Property<int>("OutdoorDashboardDataId")
                                 .ValueGeneratedOnAdd()
@@ -455,12 +460,12 @@ namespace Netatmo.Dashboard.Data.Migrations
 
                             b1.ToTable("DashboardData");
 
-                            b1.HasOne("Netatmo.Dashboard.Core.Models.OutdoorDashboardData")
+                            b1.HasOne("Netatmo.Dashboard.Api.Models.OutdoorDashboardData")
                                 .WithOne("Temperature")
-                                .HasForeignKey("Netatmo.Dashboard.Core.Models.TemperatureData", "OutdoorDashboardDataId")
+                                .HasForeignKey("Netatmo.Dashboard.Api.Models.TemperatureData", "OutdoorDashboardDataId")
                                 .OnDelete(DeleteBehavior.Cascade);
 
-                            b1.OwnsOne("Netatmo.Dashboard.Core.Models.TemperatureMinMax", "Max", b2 =>
+                            b1.OwnsOne("Netatmo.Dashboard.Api.Models.TemperatureMinMax", "Max", b2 =>
                                 {
                                     b2.Property<int>("TemperatureDataOutdoorDashboardDataId")
                                         .ValueGeneratedOnAdd()
@@ -476,13 +481,13 @@ namespace Netatmo.Dashboard.Data.Migrations
 
                                     b2.ToTable("DashboardData");
 
-                                    b2.HasOne("Netatmo.Dashboard.Core.Models.TemperatureData")
+                                    b2.HasOne("Netatmo.Dashboard.Api.Models.TemperatureData")
                                         .WithOne("Max")
-                                        .HasForeignKey("Netatmo.Dashboard.Core.Models.TemperatureMinMax", "TemperatureDataOutdoorDashboardDataId")
+                                        .HasForeignKey("Netatmo.Dashboard.Api.Models.TemperatureMinMax", "TemperatureDataOutdoorDashboardDataId")
                                         .OnDelete(DeleteBehavior.Cascade);
                                 });
 
-                            b1.OwnsOne("Netatmo.Dashboard.Core.Models.TemperatureMinMax", "Min", b2 =>
+                            b1.OwnsOne("Netatmo.Dashboard.Api.Models.TemperatureMinMax", "Min", b2 =>
                                 {
                                     b2.Property<int>("TemperatureDataOutdoorDashboardDataId")
                                         .ValueGeneratedOnAdd()
@@ -498,17 +503,17 @@ namespace Netatmo.Dashboard.Data.Migrations
 
                                     b2.ToTable("DashboardData");
 
-                                    b2.HasOne("Netatmo.Dashboard.Core.Models.TemperatureData")
+                                    b2.HasOne("Netatmo.Dashboard.Api.Models.TemperatureData")
                                         .WithOne("Min")
-                                        .HasForeignKey("Netatmo.Dashboard.Core.Models.TemperatureMinMax", "TemperatureDataOutdoorDashboardDataId")
+                                        .HasForeignKey("Netatmo.Dashboard.Api.Models.TemperatureMinMax", "TemperatureDataOutdoorDashboardDataId")
                                         .OnDelete(DeleteBehavior.Cascade);
                                 });
                         });
                 });
 
-            modelBuilder.Entity("Netatmo.Dashboard.Core.Models.ModuleDevice", b =>
+            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.ModuleDevice", b =>
                 {
-                    b.OwnsOne("Netatmo.Dashboard.Core.Models.Battery", "Battery", b1 =>
+                    b.OwnsOne("Netatmo.Dashboard.Api.Models.Battery", "Battery", b1 =>
                         {
                             b1.Property<string>("ModuleDeviceId");
 
@@ -520,9 +525,9 @@ namespace Netatmo.Dashboard.Data.Migrations
 
                             b1.ToTable("Devices");
 
-                            b1.HasOne("Netatmo.Dashboard.Core.Models.ModuleDevice")
+                            b1.HasOne("Netatmo.Dashboard.Api.Models.ModuleDevice")
                                 .WithOne("Battery")
-                                .HasForeignKey("Netatmo.Dashboard.Core.Models.Battery", "ModuleDeviceId")
+                                .HasForeignKey("Netatmo.Dashboard.Api.Models.Battery", "ModuleDeviceId")
                                 .OnDelete(DeleteBehavior.Cascade);
                         });
                 });

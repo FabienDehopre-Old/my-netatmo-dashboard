@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Netatmo.Dashboard.Core.Models;
+using Netatmo.Dashboard.Api.Models;
 
-namespace Netatmo.Dashboard.Data
+namespace Netatmo.Dashboard.Api
 {
     public class NetatmoDbContext : DbContext
     {
@@ -35,6 +35,7 @@ namespace Netatmo.Dashboard.Data
             modelBuilder.Entity<User>().Property(e => e.AccessToken).IsUnicode().HasMaxLength(64);
             modelBuilder.Entity<User>().Property(e => e.ExpiresAt).IsRequired(false);
             modelBuilder.Entity<User>().Property(e => e.RefreshToken).IsUnicode().HasMaxLength(64);
+            modelBuilder.Entity<User>().HasIndex(e => e.Uid).IsUnique();
         }
 
         private void ConfigureStationModel(ModelBuilder modelBuilder)
