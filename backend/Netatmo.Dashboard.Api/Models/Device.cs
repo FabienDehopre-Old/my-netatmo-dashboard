@@ -9,7 +9,7 @@ namespace Netatmo.Dashboard.Api.Models
         public int Firmware { get; set; }
         public int StationId { get; set; }
         public virtual Station Station { get; set; }
-        public ICollection<DashboardData> DashboardData { get; set; }
+        public virtual List<DashboardData> DashboardData { get; set; }
     }
 
     public class MainDevice : Device

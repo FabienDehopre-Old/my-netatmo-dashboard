@@ -5,6 +5,10 @@ namespace Netatmo.Dashboard.Api
 {
     public class NetatmoDbContext : DbContext
     {
+        public NetatmoDbContext() : base()
+        {
+        }
+
         public NetatmoDbContext(DbContextOptions options)
             : base(options)
         {
@@ -18,6 +22,11 @@ namespace Netatmo.Dashboard.Api
         public DbSet<Device> Devices { get; set; }
         public DbSet<DashboardData> DashboardData { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.UseLazyLoadingProxies();
+        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ConfigureUserModel(modelBuilder);
@@ -30,11 +39,16 @@ namespace Netatmo.Dashboard.Api
         {
             modelBuilder.Entity<User>().HasKey(e => e.Id);
             modelBuilder.Entity<User>().Property(e => e.Id).UseSqlServerIdentityColumn();
-            modelBuilder.Entity<User>().Property(e => e.Uid).IsRequired().IsUnicode().HasMaxLength(32);
+            modelBuilder.Entity<User>().Property(e => e.Uid).IsRequired().IsUnicode().HasMaxLength(64);
             modelBuilder.Entity<User>().Property(e => e.Enabled).IsRequired().HasDefaultValue(false);
             modelBuilder.Entity<User>().Property(e => e.AccessToken).IsUnicode().HasMaxLength(64);
             modelBuilder.Entity<User>().Property(e => e.ExpiresAt).IsRequired(false);
             modelBuilder.Entity<User>().Property(e => e.RefreshToken).IsUnicode().HasMaxLength(64);
+            modelBuilder.Entity<User>().Property(e => e.UpdateJobId).IsUnicode().HasMaxLength(100).IsRequired(false);
+            modelBuilder.Entity<User>().OwnsOne(e => e.Units).Property(u => u.FeelLike).IsRequired(false);
+            modelBuilder.Entity<User>().OwnsOne(e => e.Units).Property(u => u.PressureUnit).IsRequired(false);
+            modelBuilder.Entity<User>().OwnsOne(e => e.Units).Property(u => u.Unit).IsRequired(false);
+            modelBuilder.Entity<User>().OwnsOne(e => e.Units).Property(u => u.WindUnit).IsRequired(false);
             modelBuilder.Entity<User>().HasIndex(e => e.Uid).IsUnique();
         }
 

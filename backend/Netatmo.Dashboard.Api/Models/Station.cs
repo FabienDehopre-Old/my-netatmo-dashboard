@@ -9,6 +9,6 @@ namespace Netatmo.Dashboard.Api.Models
         public Location Location { get; set; }
         public int UserId { get; set; }
         public virtual User User { get; set; }
-        public List<Device> Devices { get; set; }
+        public virtual List<Device> Devices { get; set; }
     }
 }

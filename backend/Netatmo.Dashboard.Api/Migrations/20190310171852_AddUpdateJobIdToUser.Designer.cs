@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Netatmo.Dashboard.Api;
 
 namespace Netatmo.Dashboard.Api.Migrations
 {
     [DbContext(typeof(NetatmoDbContext))]
-    partial class NetatmoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190310171852_AddUpdateJobIdToUser")]
+    partial class AddUpdateJobIdToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -111,7 +113,7 @@ namespace Netatmo.Dashboard.Api.Migrations
 
                     b.Property<string>("Uid")
                         .IsRequired()
-                        .HasMaxLength(64)
+                        .HasMaxLength(32)
                         .IsUnicode(true);
 
                     b.Property<string>("UpdateJobId")
@@ -287,33 +289,6 @@ namespace Netatmo.Dashboard.Api.Migrations
                                         .HasForeignKey("Netatmo.Dashboard.Api.Models.GeoPoint", "LocationStationId")
                                         .OnDelete(DeleteBehavior.Cascade);
                                 });
-                        });
-                });
-
-            modelBuilder.Entity("Netatmo.Dashboard.Api.Models.User", b =>
-                {
-                    b.OwnsOne("Netatmo.Dashboard.Api.Models.Units", "Units", b1 =>
-                        {
-                            b1.Property<int>("UserId")
-                                .ValueGeneratedOnAdd()
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                            b1.Property<int?>("FeelLike");
-
-                            b1.Property<int?>("PressureUnit");
-
-                            b1.Property<int?>("Unit");
-
-                            b1.Property<int?>("WindUnit");
-
-                            b1.HasKey("UserId");
-
-                            b1.ToTable("Users");
-
-                            b1.HasOne("Netatmo.Dashboard.Api.Models.User")
-                                .WithOne("Units")
-                                .HasForeignKey("Netatmo.Dashboard.Api.Models.Units", "UserId")
-                                .OnDelete(DeleteBehavior.Cascade);
                         });
                 });
 
