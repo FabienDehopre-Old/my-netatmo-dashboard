@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,16 @@ namespace Netatmo.Dashboard.Api
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddHangfire(config => config.UseSqlServerStorage(Configuration.GetConnectionString("Default")));
 
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.Authority = "https://dehopre.eu.auth0.com/";
+                options.Audience = "https://netatmo.dehopre.com/api";
+            });
+
             services.Configure<NetatmoOptions>(Configuration.GetSection("Netatmo"));
 
             services.AddScoped<HttpClient>();
@@ -48,6 +59,7 @@ namespace Netatmo.Dashboard.Api
                 app.UseHsts();
             }
 
+            app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseMvc();
 
