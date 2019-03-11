@@ -20,7 +20,7 @@ namespace Netatmo.Dashboard.Api.Models
     public class ModuleDevice : Device
     {
         public int RfStatus { get; set; }
-        public Battery Battery { get; set; }
+        public virtual Battery Battery { get; set; }
         public ModuleDeviceType Type { get; set; }
     }
 }

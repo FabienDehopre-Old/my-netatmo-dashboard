@@ -80,6 +80,10 @@ namespace Netatmo.Dashboard.Api
                 .HasOne(e => e.Station)
                 .WithMany(e => e.Devices)
                 .HasForeignKey(e => e.StationId);
+            modelBuilder.Entity<Device>()
+                .HasDiscriminator<string>("module_type")
+                .HasValue<MainDevice>("main")
+                .HasValue<ModuleDevice>("module");
             modelBuilder.Entity<MainDevice>().HasBaseType<Device>().Property(e => e.WifiStatus).IsRequired();
             modelBuilder.Entity<ModuleDevice>().HasBaseType<Device>().Property(e => e.RfStatus).IsRequired();
             modelBuilder.Entity<ModuleDevice>().HasBaseType<Device>().OwnsOne(e => e.Battery).Property(b => b.Percent).IsRequired();
@@ -96,6 +100,13 @@ namespace Netatmo.Dashboard.Api
                 .HasOne(e => e.Device)
                 .WithMany(e => e.DashboardData)
                 .HasForeignKey(e => e.DeviceId);
+            modelBuilder.Entity<DashboardData>()
+                .HasDiscriminator<string>("type")
+                .HasValue<MainDashboardData>("NAMain")
+                .HasValue<OutdoorDashboardData>("NAModule1")
+                .HasValue<WindGaugeDashboardData>("NAModule2")
+                .HasValue<RainGaugeDashboardData>("NAModule3")
+                .HasValue<IndoorDashboardData>("NAModule4");
             modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).Property(t => t.Current).IsRequired();
             modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).Property(t => t.Trend).IsRequired();
             modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).OwnsOne(t => t.Max).Property(x => x.Value).IsRequired();

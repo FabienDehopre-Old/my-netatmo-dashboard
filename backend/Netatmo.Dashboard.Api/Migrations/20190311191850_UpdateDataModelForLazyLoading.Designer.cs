@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Netatmo.Dashboard.Api;
 
 namespace Netatmo.Dashboard.Api.Migrations
 {
     [DbContext(typeof(NetatmoDbContext))]
-    partial class NetatmoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190311191850_UpdateDataModelForLazyLoading")]
+    partial class UpdateDataModelForLazyLoading
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

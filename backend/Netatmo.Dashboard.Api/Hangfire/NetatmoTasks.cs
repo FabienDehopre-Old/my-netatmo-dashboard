@@ -43,22 +43,62 @@ namespace Netatmo.Dashboard.Api.Hangfire
                 user.Units.Unit = (Unit)weatherData.Body.User.AdminData.Unit;
                 user.Units.WindUnit = (WindUnit)weatherData.Body.User.AdminData.WindUnit;
 
-                foreach (var device in weatherData.Body.Devices)
+                foreach (var deviceDto in weatherData.Body.Devices)
                 {
-                    var station = user.Stations.SingleOrDefault(s => s.Devices.Select(d => d.Id).Contains(device.Id));
+                    var station = user.Stations.SingleOrDefault(s => s.Devices.Select(d => d.Id).Contains(deviceDto.Id));
                     if (station == null)
                     {
                         station = new Station { Devices = new List<Models.Device>(), Location = new Location() };
                         user.Stations.Add(station);
                     }
 
-                    station.Name = device.StationName;
-                    station.Location.Altitude = device.Place.Altitude;
-                    station.Location.City = device.Place.City;
-                    station.Location.Country = device.Place.Country;
-                    station.Location.GeoLocation = new GeoPoint { Latitude = device.Place.Location[0], Longitude = device.Place.Location[1] };
-                    station.Location.Timezone = device.Place.Timezone;
-                    // TODO: continue
+                    station.Name = deviceDto.StationName;
+                    station.Location.Altitude = deviceDto.Place.Altitude;
+                    station.Location.City = deviceDto.Place.City;
+                    station.Location.Country = deviceDto.Place.Country;
+                    station.Location.GeoLocation = new GeoPoint { Latitude = deviceDto.Place.Location[0], Longitude = deviceDto.Place.Location[1] };
+                    station.Location.Timezone = deviceDto.Place.Timezone;
+
+                    var mainModule = station.Devices.OfType<MainDevice>().SingleOrDefault(d => d.Id == deviceDto.Id);
+                    if (mainModule == null)
+                    {
+                        mainModule = new MainDevice
+                        {
+                            Id = deviceDto.Id,
+                            DashboardData = new List<DashboardData>()
+                        };
+                        station.Devices.Add(mainModule);
+                    }
+
+                    mainModule.Name = deviceDto.ModuleName;
+                    mainModule.Firmware = deviceDto.FirmwareVersion;
+                    mainModule.WifiStatus = deviceDto.WifiStatus;
+                    mainModule.DashboardData.Add(Convert2MainDashboardData(deviceDto.DashboardData));
+
+                    foreach (var moduleDto in deviceDto.Modules)
+                    {
+                        var module = station.Devices.OfType<ModuleDevice>().SingleOrDefault(d => d.Id == moduleDto.Id);
+                        if (module == null)
+                        {
+                            module = new ModuleDevice
+                            {
+                                Id = moduleDto.Id,
+                                Type = ConvertToModuleType(moduleDto.Type),
+                                DashboardData = new List<DashboardData>()
+                            };
+                            station.Devices.Add(module);
+                        }
+
+                        module.Name = moduleDto.ModuleName;
+                        module.Firmware = moduleDto.FirmwareVersion;
+                        module.RfStatus = moduleDto.RFStatus;
+                        module.Battery = new Battery
+                        {
+                            Vp = moduleDto.BatteryPower,
+                            Percent = moduleDto.BatteryPercentage
+                        };
+                        module.DashboardData.Add(Convert2ModuleDashboardData(moduleDto));
+                    }
                 }
 
                 await db.SaveChangesAsync();
@@ -108,6 +148,156 @@ namespace Netatmo.Dashboard.Api.Hangfire
             var response = await httpClient.PostAsync("https://api.netatmo.com/api/getstationsdata", new FormUrlEncodedContent(nameValueCollection));
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsAsync<WeatherData>();
+        }
+
+        private ModuleDeviceType ConvertToModuleType(ModuleType type)
+        {
+            switch (type)
+            {
+                case ModuleType.Indoor:
+                    return ModuleDeviceType.Indoor;
+                case ModuleType.Outdoor:
+                    return ModuleDeviceType.Outdoor;
+                case ModuleType.RainGauge:
+                    return ModuleDeviceType.RainGauge;
+                case ModuleType.WindGauge:
+                    return ModuleDeviceType.WindGauge;
+                default:
+                    throw new InvalidCastException("The module type is not valid.");    // this should never happen
+            }
+        }
+
+        private MainDashboardData Convert2MainDashboardData(MainModuleDashboardData data)
+        {
+            return new MainDashboardData
+            {
+                TimeUtc = DateTimeOffset.FromUnixTimeSeconds(data.TimeUtc).DateTime,
+                Temperature = new TemperatureData
+                {
+                    Current = data.Temperature,
+                    Min = new TemperatureMinMax
+                    {
+                         Timestamp = DateTimeOffset.FromUnixTimeSeconds(data.MinTemperatureTimeUtc).DateTime,
+                         Value = data.MinTemperature
+                    },
+                    Max = new TemperatureMinMax
+                    {
+                        Timestamp = DateTimeOffset.FromUnixTimeSeconds(data.MaxTemperatureTimeUtc).DateTime,
+                        Value = data.MaxTemperature
+                    },
+                    Trend = (Models.Trend)data.TemperatureTrend
+                },
+                Pressure = new PressureData
+                {
+                    Value = data.Pressure,
+                    Absolute = data.AbsolutePressure,
+                    Trend = (Models.Trend)data.PressureTrend
+                },
+                CO2 = data.CO2,
+                Humidity = data.Humidity,
+                Noise = data.Noise
+            };
+        }
+
+        private DashboardData Convert2ModuleDashboardData(Module module)
+        {
+            var outdoorModule = module as OutdoorModule;
+            var windGaugeModule = module as WindGaugeModule;
+            var rainGaugeModule = module as RainGaugeModule;
+            var indoorModule = module as IndoorModule;
+            if (outdoorModule != null)
+            {
+                return Convert2OutdoorDashboardData(outdoorModule.DashboardData);
+            }
+
+            if (windGaugeModule != null)
+            {
+                return Convert2WindGaugeDashboardData(windGaugeModule.DashboardData);
+            }
+
+            if (rainGaugeModule != null)
+            {
+                return Convert2RainGaugeDashboardData(rainGaugeModule.DashboardData);
+            }
+
+            if (indoorModule != null)
+            {
+                return Convert2IndoorDashboardData(indoorModule.DashboardData);
+            }
+
+            throw new InvalidCastException("The module is not valid.");    // this should never happen
+        }
+
+        private OutdoorDashboardData Convert2OutdoorDashboardData(OutdoorModuleDashboardData data)
+        {
+            return new OutdoorDashboardData
+            {
+                TimeUtc = DateTimeOffset.FromUnixTimeSeconds(data.TimeUtc).DateTime,
+                Temperature = new TemperatureData
+                {
+                    Current = data.Temperature,
+                    Min = new TemperatureMinMax
+                    {
+                        Timestamp = DateTimeOffset.FromUnixTimeSeconds(data.MinTemperatureTimeUtc).DateTime,
+                        Value = data.MinTemperature
+                    },
+                    Max = new TemperatureMinMax
+                    {
+                        Timestamp = DateTimeOffset.FromUnixTimeSeconds(data.MaxTemperatureTimeUtc).DateTime,
+                        Value = data.MaxTemperature
+                    },
+                    Trend = (Models.Trend)data.TemperatureTrend
+                },
+                Humidity = data.Humidity
+            };
+        }
+
+        private WindGaugeDashboardData Convert2WindGaugeDashboardData(WindGaugeModuleDashboardData data)
+        {
+            return new WindGaugeDashboardData
+            {
+                TimeUtc = DateTimeOffset.FromUnixTimeSeconds(data.TimeUtc).DateTime,
+                WindStrength = data.WindStrength,
+                WindAngle = data.WindAngle,
+                GustStrength = data.GustStrength,
+                GustAngle = data.GustAngle
+            };
+        }
+
+        private RainGaugeDashboardData Convert2RainGaugeDashboardData(RainGaugeModuleDashboardData data)
+        {
+            return new RainGaugeDashboardData
+            {
+                TimeUtc = DateTimeOffset.FromUnixTimeSeconds(data.TimeUtc).DateTime,
+                Rain = data.Rain,
+                Sum24H = data.SumRainOver24h,
+                Sum1H = data.SumRainOver1h
+            };
+        }
+
+        private IndoorDashboardData Convert2IndoorDashboardData(IndoorModuleDashboardData data)
+        {
+            return new IndoorDashboardData
+            {
+                TimeUtc = DateTimeOffset.FromUnixTimeSeconds(data.TimeUtc).DateTime,
+                Temperature = new TemperatureData
+                {
+                    Current = data.Temperature,
+                    Min = new TemperatureMinMax
+                    {
+                        Timestamp = DateTimeOffset.FromUnixTimeSeconds(data.MinTemperatureTimeUtc).DateTime,
+                        Value = data.MinTemperature
+                    },
+                    Max = new TemperatureMinMax
+                    {
+                        Timestamp = DateTimeOffset.FromUnixTimeSeconds(data.MaxTemperatureTimeUtc).DateTime,
+                        Value = data.MaxTemperature
+                    },
+                    Trend = (Models.Trend)data.TemperatureTrend
+                },
+                CO2 = data.CO2,
+                Humidity = data.Humidity
+            };
         }
     }
 }

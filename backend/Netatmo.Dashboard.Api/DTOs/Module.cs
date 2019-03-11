@@ -22,7 +22,7 @@ namespace Netatmo.Dashboard.Api.DTOs
         public string[] DataType { get; set; }
 
         [DataMember(Name = "firmware")]
-        public int Firmware { get; set; }
+        public int FirmwareVersion { get; set; }
 
         [DataMember(Name = "rf_status")]
         public int RFStatus { get; set; }

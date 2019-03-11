@@ -11,6 +11,6 @@ namespace Netatmo.Dashboard.Api.DTOs
     public abstract class ModuleDashboardData
     {
         [DataMember(Name = "time_utc")]
-        public int TimeUtc { get; set; }
+        public long TimeUtc { get; set; }
     }
 }

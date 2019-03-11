@@ -13,6 +13,6 @@ namespace Netatmo.Dashboard.Api.Models
         public string RefreshToken { get; set; }
         public virtual List<Station> Stations { get; set; }
         public string UpdateJobId { get; set; }
-        public Units Units { get; set; }
+        public virtual Units Units { get; set; }
     }
 }

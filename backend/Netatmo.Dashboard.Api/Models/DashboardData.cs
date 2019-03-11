@@ -12,8 +12,8 @@ namespace Netatmo.Dashboard.Api.Models
 
     public class MainDashboardData : DashboardData
     {
-        public TemperatureData Temperature { get; set; }
-        public PressureData Pressure { get; set; }
+        public virtual TemperatureData Temperature { get; set; }
+        public virtual PressureData Pressure { get; set; }
         public int CO2 { get; set; }
         public int Humidity { get; set; }
         public int Noise { get; set; }
@@ -21,15 +21,15 @@ namespace Netatmo.Dashboard.Api.Models
 
     public class OutdoorDashboardData : DashboardData
     {
-        public TemperatureData Temperature { get; set; }
+        public virtual TemperatureData Temperature { get; set; }
         public int Humidity { get; set; }
     }
 
     public class WindGaugeDashboardData : DashboardData
     {
-        public int WindStrength { get; set; }
+        public decimal WindStrength { get; set; }
         public int WindAngle { get; set; }
-        public int GustStrength { get; set; }
+        public decimal GustStrength { get; set; }
         public int GustAngle { get; set; }
     }
 
@@ -42,7 +42,7 @@ namespace Netatmo.Dashboard.Api.Models
 
     public class IndoorDashboardData : DashboardData
     {
-        public TemperatureData Temperature { get; set; }
+        public virtual TemperatureData Temperature { get; set; }
         public int CO2 { get; set; }
         public int Humidity { get; set; }
     }
