@@ -1,75 +1,104 @@
 {
-  "extends": "tslint:recommended",
-  "rulesDirectory": [
-    "codelyzer"
-  ],
+  "extends": ["tslint:latest", "tslint-config-prettier"],
+  "rulesDirectory": ["codelyzer", "rxjs-tslint"],
   "rules": {
-    "array-type": false,
-    "arrow-parens": false,
-    "deprecation": {
-      "severity": "warn"
-    },
-    "import-blacklist": [
-      true,
-      "rxjs/Rx"
-    ],
-    "interface-name": false,
-    "max-classes-per-file": false,
-    "max-line-length": [
-      true,
-      140
-    ],
-    "member-access": false,
+    // TypeScript-specific
+    "member-access": [true, "no-public"],
     "member-ordering": [
       true,
       {
-        "order": [
-          "static-field",
-          "instance-field",
-          "static-method",
-          "instance-method"
-        ]
+        "order": ["static-field", "instance-field", "static-method", "instance-method"]
       }
     ],
-    "no-consecutive-blank-lines": false,
-    "no-console": [
-      true,
-      "debug",
-      "info",
-      "time",
-      "timeEnd",
-      "trace"
-    ],
-    "no-empty": false,
-    "no-inferrable-types": [
-      true,
-      "ignore-params"
-    ],
-    "no-non-null-assertion": true,
-    "no-redundant-jsdoc": true,
+    "no-inferrable-types": [true, "ignore-params", "ignore-properties"],
+    "no-parameter-reassignment": true,
+    "no-unnecessary-type-assertion": true,
+    "typedef": [true, "call-signature", "parameter", "member-variable-declaration", "property-declaration"],
+
+    // Functionality
+    "import-blacklist": [true, "rxjs/Rx", "primeng/primeng"],
+    "no-inferred-empty-object-type": true,
+    "no-invalid-this": true,
+    "no-null-keyword": true,
     "no-switch-case-fall-through": true,
-    "no-use-before-declare": true,
-    "no-var-requires": false,
-    "object-literal-key-quotes": [
-      true,
-      "as-needed"
-    ],
+    "no-unnecessary-class": [true, "allow-empty-class", "allow-static-only"],
+    "restrict-plus-operands": true,
+    "triple-equals": [true, "allow-undefined-check"],
+    "unnecessary-constructor": true,
+
+    // Maintainability
+    "cyclomatic-complexity": true,
+    "deprecation": {
+      "severity": "warning"
+    },
+    "max-file-line-count": [true, 300],
+    "no-default-export": true,
+    "no-default-import": true,
     "object-literal-sort-keys": false,
-    "ordered-imports": false,
-    "quotemark": [
+    "prefer-readonly": true,
+
+    // Style
+    "binary-expression-operand-order": true,
+    "encoding": true,
+    "file-name-casing": [true, "kebab-case"],
+    "increment-decrement": [true, "allow-post"],
+    "interface-name": [true, "never-prefix"],
+    "ordered-imports": [
       true,
-      "single"
+      {
+        "import-sources-order": "case-insensitive",
+        "grouped-imports": true,
+        "named-imports-order": "case-insensitive",
+        "module-source-path": "full"
+      }
     ],
-    "trailing-comma": false,
+    "prefer-template": true,
+    "switch-final-break": [true, "always"],
+    "variable-name": [true, "ban-keywords", "check-format"],
+    "no-submodule-imports": [true, "rxjs", "primeng", "@angular/core", "@angular/platform-browser", "@angular/common", "@angular/cdk"],
+
+    // Codelyzer
+    "banana-in-box": true,
+    "contextual-life-cycle": true,
+    "decorator-not-allowed": true,
+    "pipe-impure": true,
+    "templates-no-negated-async": true,
+    "max-inline-declarations": true,
+    "no-attribute-parameter-decorator": true,
+    "no-conflicting-life-cycle-hooks": true,
+    "no-forward-ref": true,
+    "no-input-prefix": true,
+    "no-input-rename": true,
+    "no-life-cycle-call": true,
+    "no-output-named-after-standard-event": true,
     "no-output-on-prefix": true,
+    "no-output-rename": true,
+    "no-template-call-expression": true,
+    "no-unused-css": true,
+    "prefer-output-readonly": true,
+    "template-conditional-complexity": true,
+    "trackBy-function": true,
+    "use-life-cycle-interface": true,
+    "use-pipe-decorator": true,
+    "use-pipe-transform-interface": true,
+    "use-view-encapsulation": true,
+    "component-class-suffix": true,
+    "directive-class-suffix": true,
+    "enforce-component-selector": true,
+    "no-queries-parameter": true,
+    "pipe-naming": ["camelCase"],
+    "prefer-inline-decorator": [true, "HostListener"],
+    "use-host-property-decorator": true,
     "use-input-property-decorator": true,
     "use-output-property-decorator": true,
-    "use-host-property-decorator": true,
-    "no-input-rename": true,
-    "no-output-rename": true,
-    "use-life-cycle-interface": true,
-    "use-pipe-transform-interface": true,
-    "component-class-suffix": true,
-    "directive-class-suffix": true
+
+    // RxJS
+    "rxjs-collapse-imports": true,
+    "rxjs-pipeable-operators-only": true,
+    "rxjs-no-static-observable-methods": true,
+    "rxjs-proper-imports": true
+  },
+  "linterOptions": {
+    "exclude": ["src/polyfills.ts", "src/test.ts"]
   }
 }
