@@ -1,5 +1,5 @@
 import { ErrorHandler, Injectable } from '@angular/core';
-import * as Sentry from "@sentry/browser";
+import * as Sentry from '@sentry/browser';
 
 @Injectable()
 export class SentryErrorHandler extends ErrorHandler {

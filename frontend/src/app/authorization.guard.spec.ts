@@ -5,7 +5,7 @@ import { AuthorizationGuard } from './authorization.guard';
 describe('AuthorizationGuard', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [AuthorizationGuard]
+      providers: [AuthorizationGuard],
     });
   });
 

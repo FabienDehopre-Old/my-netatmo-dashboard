@@ -1,9 +1,10 @@
 import { HttpClientModule } from '@angular/common/http';
 import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import * as Sentry from "@sentry/browser";
+import * as Sentry from '@sentry/browser';
 import {
-  AuthModule, AuthWellKnownEndpoints,
+  AuthModule,
+  AuthWellKnownEndpoints,
   OidcConfigService,
   OidcSecurityService,
   OpenIDImplicitFlowConfiguration,
@@ -15,7 +16,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { SentryErrorHandler } from './sentry-error-handler';
 
 Sentry.init({
-  dsn: "https://2dac4e9cc7814299add137cbfd63b940@sentry.io/1413628"
+  dsn: 'https://2dac4e9cc7814299add137cbfd63b940@sentry.io/1413628',
 });
 
 export function loadConfig(oidcConfigService: OidcConfigService): () => void {
@@ -23,16 +24,8 @@ export function loadConfig(oidcConfigService: OidcConfigService): () => void {
 }
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    HomeComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    AuthModule.forRoot()
-  ],
+  declarations: [AppComponent, HomeComponent],
+  imports: [BrowserModule, AppRoutingModule, HttpClientModule, AuthModule.forRoot()],
   providers: [
     { provide: ErrorHandler, useClass: SentryErrorHandler },
     OidcConfigService,
@@ -40,16 +33,13 @@ export function loadConfig(oidcConfigService: OidcConfigService): () => void {
       provide: APP_INITIALIZER,
       useFactory: loadConfig,
       deps: [OidcConfigService],
-      multi: true
-    }
+      multi: true,
+    },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {
-  constructor(
-    private readonly oidcSecurityService: OidcSecurityService,
-    private readonly oidcConfigService: OidcConfigService
-  ) {
+  constructor(private readonly oidcSecurityService: OidcSecurityService, private readonly oidcConfigService: OidcConfigService) {
     this.oidcConfigService.onConfigurationLoaded.subscribe(() => {
       const oidcImplicitFlowConfig = new OpenIDImplicitFlowConfiguration();
       oidcImplicitFlowConfig.stsServer = this.oidcConfigService.clientConfiguration.stsServer;
@@ -71,10 +61,7 @@ export class AppModule {
       const authWellKnownEndpoints = new AuthWellKnownEndpoints();
       authWellKnownEndpoints.setWellKnownEndpoints(this.oidcConfigService.wellKnownEndpoints);
 
-      this.oidcSecurityService.setupModule(
-        oidcImplicitFlowConfig,
-        authWellKnownEndpoints
-      );
+      this.oidcSecurityService.setupModule(oidcImplicitFlowConfig, authWellKnownEndpoints);
     });
   }
 }

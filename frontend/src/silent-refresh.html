@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Silent Refresh</title>
-</head>
-<body>
-<script>
-  window.onload = function() {
-    var parent = window.parent;
-    var event = new CustomEvent('oidc-silent-renew-message', { detail: window.location.hash.substr(1) });
-    parent.dispatchEvent(event);
-  }
-</script>
-</body>
+  </head>
+  <body>
+    <script>
+      window.onload = function() {
+        var parent = window.parent;
+        var event = new CustomEvent('oidc-silent-renew-message', { detail: window.location.hash.substr(1) });
+        parent.dispatchEvent(event);
+      };
+    </script>
+  </body>
 </html>
