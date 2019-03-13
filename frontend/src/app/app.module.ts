@@ -11,15 +11,14 @@ import {
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { SentryErrorHandler } from './sentry-error-handler';
 import { HomeComponent } from './pages/home/home.component';
+import { SentryErrorHandler } from './sentry-error-handler';
 
 Sentry.init({
   dsn: "https://2dac4e9cc7814299add137cbfd63b940@sentry.io/1413628"
 });
 
 export function loadConfig(oidcConfigService: OidcConfigService): () => void {
-  console.log('APP_INITIALIZER STARTING');
   return () => oidcConfigService.load(`${window.location.origin}/assets/oidc-implicit-flow-config.json`);
 }
 
@@ -77,7 +76,5 @@ export class AppModule {
         authWellKnownEndpoints
       );
     });
-
-    console.log('APP STARTING');
   }
 }

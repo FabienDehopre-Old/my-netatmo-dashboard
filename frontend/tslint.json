@@ -16,7 +16,7 @@
     "typedef": [true, "call-signature", "parameter", "member-variable-declaration", "property-declaration"],
 
     // Functionality
-    "import-blacklist": [true, "rxjs/Rx", "primeng/primeng"],
+    "import-blacklist": [true, "rxjs/Rx"],
     "no-inferred-empty-object-type": true,
     "no-invalid-this": true,
     "no-null-keyword": true,
@@ -55,7 +55,7 @@
     "prefer-template": true,
     "switch-final-break": [true, "always"],
     "variable-name": [true, "ban-keywords", "check-format"],
-    "no-submodule-imports": [true, "rxjs", "primeng", "@angular/core", "@angular/platform-browser", "@angular/common", "@angular/cdk"],
+    "no-submodule-imports": [true, "rxjs", "@angular/core", "@angular/platform-browser", "@angular/common", "@angular/router"],
 
     // Codelyzer
     "banana-in-box": true,

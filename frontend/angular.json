@@ -24,7 +24,8 @@
             "tsConfig": "src/tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "src/silent-refresh.html"
             ],
             "styles": [
               "src/styles.scss"
@@ -42,7 +43,10 @@
               ],
               "optimization": true,
               "outputHashing": "all",
-              "sourceMap": false,
+              "sourceMap": {
+                "hidden": true,
+                "scripts": true
+              },
               "extractCss": true,
               "namedChunks": false,
               "aot": true,
@@ -62,7 +66,11 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "my-netatmo-dashboard:build"
+            "browserTarget": "my-netatmo-dashboard:build",
+            "ssl": true,
+            "sslCert": "ssl/server.crt",
+            "sslKey": "ssl/server.key",
+            "aot": true
           },
           "configurations": {
             "production": {
@@ -102,7 +110,15 @@
             ],
             "exclude": [
               "**/node_modules/**"
-            ]
+            ],
+            "fix": true,
+            "typeCheck": true,
+            "format": "verbose"
+          },
+          "configurations": {
+            "ci": {
+              "fix": false
+            }
           }
         }
       }
