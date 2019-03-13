@@ -1,0 +1,7 @@
+{
+  "logLevel": "DEBUG",
+  "auth0": {
+    "domain": "dehopre.eu.auth0.com",
+    "clientId": "cfH0Ie4vm8TQ1wySzRc4qKgFCbBvltKk"
+  }
+}

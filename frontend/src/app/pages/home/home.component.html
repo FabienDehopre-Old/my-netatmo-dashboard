@@ -1,3 +1,5 @@
 <p>
   home works!
 </p>
+<pre *ngIf="userInfo$">{{ userInfo$ | async | json }}</pre>
+<button (click)="logout()">Logout</button>
