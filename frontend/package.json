@@ -4,13 +4,15 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "prebuild": "node write-version.js",
     "build": "ng build --prod",
     "test": "ng test",
     "lint": "ng lint",
     "lint:check": "ng lint --configuration=ci",
     "e2e": "ng e2e",
     "format": "prettier --write **/*.{ts,scss,html,json,js,md,yml,yaml}",
-    "format:check": "prettier --list-different **/*.{ts,scss,html,json,js,md,yml,yaml}"
+    "format:check": "prettier --list-different **/*.{ts,scss,html,json,js,md,yml,yaml}",
+    "postinstall": "node write-version.js"
   },
   "private": true,
   "dependencies": {
