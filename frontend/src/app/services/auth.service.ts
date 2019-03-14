@@ -30,7 +30,7 @@ export class AuthService {
             responseType: 'token id_token',
             audience: 'https://netatmo.dehopre.com/api',
             redirectUri: `${window.location.origin}/callback`,
-            scope: 'openid profile email',
+            scope: 'openid profile email read:values',
           })
       )
     );

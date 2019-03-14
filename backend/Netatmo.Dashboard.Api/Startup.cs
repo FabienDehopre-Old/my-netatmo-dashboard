@@ -24,17 +24,34 @@ namespace Netatmo.Dashboard.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddCors(options => 
+            {
+                var corsOptions = Configuration.GetSection("Cors").Get<CorsOptions>();
+                options.AddDefaultPolicy(
+                    builder => builder.AllowCredentials()
+                                      .WithOrigins(corsOptions.AllowedOrigins)
+                                      .SetIsOriginAllowedToAllowWildcardSubdomains()
+                                      .WithMethods(corsOptions.AllowedMethods)
+                                      .WithHeaders(corsOptions.AllowedHeaders)
+                );
+            });
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2); 
             services.AddHangfire(config => config.UseSqlServerStorage(Configuration.GetConnectionString("Default")));
 
+            var auth0Options = Configuration.GetSection("Auth0").Get<Auth0Options>();
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
-                options.Authority = "https://dehopre.eu.auth0.com/";
-                options.Audience = "https://netatmo.dehopre.com/api";
+                options.Authority = $"https://{auth0Options.Domain}/";
+                options.Audience = auth0Options.ApiIdentifier;
+            });
+
+            services.AddAuthorization(options => 
+            {
+                options.AddPolicy("read:values", policy => policy.Requirements.Add(new HasScopeRequirement("read:values", auth0Options.Domain)));
             });
 
             services.Configure<NetatmoOptions>(Configuration.GetSection("Netatmo"));
@@ -59,6 +76,7 @@ namespace Netatmo.Dashboard.Api
                 app.UseHsts();
             }
 
+            app.UseCors();
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseMvc();

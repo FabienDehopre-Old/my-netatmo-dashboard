@@ -2,7 +2,7 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/c
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { AuthService } from './auth.service';
+import { ACCESS_TOKEN, AuthService } from './auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -13,7 +13,7 @@ export class AuthInterceptor implements HttpInterceptor {
       return next.handle(req);
     }
 
-    const accessToken = localStorage.getItem('ACCESS_TOKEN');
+    const accessToken = localStorage.getItem(ACCESS_TOKEN);
     const authReq = req.clone({
       headers: req.headers.set('Authorization', `Bearer ${accessToken}`),
     });

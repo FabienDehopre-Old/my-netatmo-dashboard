@@ -2,4 +2,6 @@
   <p>
     home works!
   </p>
+  <pre *ngIf="result">{{ result | json }}</pre>
+  <button (click)="callApi()">Call API</button>
 </app-layout>
