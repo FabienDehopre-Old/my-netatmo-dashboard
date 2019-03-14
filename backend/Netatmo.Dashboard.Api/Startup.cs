@@ -49,10 +49,10 @@ namespace Netatmo.Dashboard.Api
                 options.Audience = auth0Options.ApiIdentifier;
             });
 
-            services.AddAuthorization(options => 
-            {
-                options.AddPolicy("read:values", policy => policy.Requirements.Add(new HasScopeRequirement("read:values", auth0Options.Domain)));
-            });
+            //services.AddAuthorization(options => 
+            //{
+            //    options.AddPolicy("read:values", policy => policy.Requirements.Add(new HasScopeRequirement("read:values", auth0Options.Domain)));
+            //});
 
             services.Configure<NetatmoOptions>(Configuration.GetSection("Netatmo"));
 

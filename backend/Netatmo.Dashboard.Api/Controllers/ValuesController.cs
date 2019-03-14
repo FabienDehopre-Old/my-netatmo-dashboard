@@ -11,7 +11,6 @@ namespace Netatmo.Dashboard.Api.Controllers
     {
         // GET api/values
         [HttpGet]
-        [Authorize("read:values")]
         public ActionResult<IEnumerable<string>> Get()
         {
             return new string[] { "value1", "value2" };
@@ -19,7 +18,6 @@ namespace Netatmo.Dashboard.Api.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        [Authorize("read:values")]
         public ActionResult<string> Get(int id)
         {
             return "value";
