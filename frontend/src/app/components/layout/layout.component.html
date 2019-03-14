@@ -104,7 +104,7 @@
     My profile
   </a>
   <mat-divider></mat-divider>
-  <a mat-menu-item [routerLink]="['/logout']">
+  <a mat-menu-item href="javascript:void(0)" (click)="logout()">
     <mat-icon>power_settings_new</mat-icon>
     Logout
   </a>
