@@ -8,11 +8,11 @@ import { ConfigService } from './config.service';
 // tslint:disable:no-console
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LoggerService {
   private level: LogLevel = LogLevel.off;
-  
+
   constructor(configService: ConfigService) {
     configService.config$
       .pipe(

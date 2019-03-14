@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (!this.authService.isAuthenticated()) {
@@ -15,7 +15,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
     const accessToken = localStorage.getItem('ACCESS_TOKEN');
     const authReq = req.clone({
-      headers: req.headers.set('Authorization', `Bearer ${accessToken}`)
+      headers: req.headers.set('Authorization', `Bearer ${accessToken}`),
     });
     return next.handle(authReq);
   }

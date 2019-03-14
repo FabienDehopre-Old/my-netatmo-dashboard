@@ -21,7 +21,7 @@ Sentry.init({
   dsn: 'https://2dac4e9cc7814299add137cbfd63b940@sentry.io/1413628',
   environment: environment.production ? 'production' : 'development',
   debug: !environment.production,
-  release: environment.production ? VERSION : undefined
+  release: environment.production ? VERSION : undefined,
 });
 
 export function initApp(configService: ConfigService): () => void {
@@ -34,7 +34,7 @@ export function initApp(configService: ConfigService): () => void {
   providers: [
     { provide: ErrorHandler, useClass: SentryErrorHandler },
     { provide: APP_INITIALIZER, useFactory: initApp, deps: [ConfigService], multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
 })

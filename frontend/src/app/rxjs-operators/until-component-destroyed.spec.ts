@@ -22,7 +22,9 @@ class TestHostComponent implements OnDestroy, OnInit {
       });
   }
 
-  ngOnDestroy(): void { /* DO NOT DELETE */ }
+  ngOnDestroy(): void {
+    /* DO NOT DELETE */
+  }
 }
 
 @Component({
@@ -48,7 +50,9 @@ class TestHostDoubleComponent implements OnDestroy, OnInit {
       });
   }
 
-  ngOnDestroy(): void { /* DO NOT DELETE */ }
+  ngOnDestroy(): void {
+    /* DO NOT DELETE */
+  }
 }
 
 @Component({

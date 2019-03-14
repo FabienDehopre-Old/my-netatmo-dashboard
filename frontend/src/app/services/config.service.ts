@@ -6,7 +6,7 @@ import { tap } from 'rxjs/operators';
 import { AppConfig } from '../models/app-config';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ConfigService {
   readonly config$: Observable<AppConfig>;
@@ -21,12 +21,10 @@ export class ConfigService {
     return this.httpClient
       .get<AppConfig>(`${window.location.origin}/assets/config.json`)
       .pipe(
-        tap(
-          config => {
-            this.configSource.next(config);
-            this.config = config;
-          }
-        )
+        tap(config => {
+          this.configSource.next(config);
+          this.config = config;
+        })
       )
       .toPromise();
   }

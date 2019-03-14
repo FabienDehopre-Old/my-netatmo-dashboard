@@ -55,7 +55,15 @@
     "prefer-template": true,
     "switch-final-break": [true, "always"],
     "variable-name": [true, "ban-keywords", "check-format"],
-    "no-submodule-imports": [true, "rxjs", "@angular/core", "@angular/platform-browser", "@angular/common", "@angular/router", "@angular/material"],
+    "no-submodule-imports": [
+      true,
+      "rxjs",
+      "@angular/core",
+      "@angular/platform-browser",
+      "@angular/common",
+      "@angular/router",
+      "@angular/material"
+    ],
 
     // Codelyzer
     "banana-in-box": true,

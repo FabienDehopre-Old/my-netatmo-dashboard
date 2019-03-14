@@ -13,7 +13,7 @@ import {
 import { AuthService, RETURN_URL } from '../services/auth.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
   constructor(private readonly authService: AuthService, private readonly router: Router) {}

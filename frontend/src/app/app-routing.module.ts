@@ -9,7 +9,7 @@ import { LoginComponent } from './pages/login/login.component';
 const routes: Routes = [
   { path: '', pathMatch: 'full', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
-  { path: 'callback', component: CallbackComponent }
+  { path: 'callback', component: CallbackComponent },
 ];
 
 @NgModule({

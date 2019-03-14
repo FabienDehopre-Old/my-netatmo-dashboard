@@ -5,5 +5,5 @@ export interface AppConfig {
   auth0: {
     domain: string;
     clientId: string;
-  }
+  };
 }

@@ -33,7 +33,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatSnackBarModule,
     MatTabsModule,
     MatToolbarModule,
-    MatTooltipModule
+    MatTooltipModule,
   ],
   exports: [
     FlexLayoutModule,
@@ -51,7 +51,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatSnackBarModule,
     MatTabsModule,
     MatToolbarModule,
-    MatTooltipModule
-  ]
+    MatTooltipModule,
+  ],
 })
-export class MaterialModule { }
+export class MaterialModule {}

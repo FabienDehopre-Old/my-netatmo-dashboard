@@ -14,34 +14,36 @@ export const EXPIRES_AT = 'expires_at';
 export const RETURN_URL = 'return_url';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private readonly webAuth$: Observable<auth0.WebAuth>;
   private refreshSubscription?: Subscription;
 
   constructor(private readonly configService: ConfigService, private readonly logger: LoggerService, private readonly router: Router) {
-    this.webAuth$ = this.configService.config$.pipe(map(config => new auth0.WebAuth({
-      clientID: config.auth0.clientId,
-      domain: config.auth0.domain,
-      responseType: 'token id_token',
-      audience: 'https://netatmo.dehopre.com/api',
-      redirectUri: `${window.location.origin}/callback`,
-      scope: 'openid profile email'
-    })));
+    this.webAuth$ = this.configService.config$.pipe(
+      map(
+        config =>
+          new auth0.WebAuth({
+            clientID: config.auth0.clientId,
+            domain: config.auth0.domain,
+            responseType: 'token id_token',
+            audience: 'https://netatmo.dehopre.com/api',
+            redirectUri: `${window.location.origin}/callback`,
+            scope: 'openid profile email',
+          })
+      )
+    );
     this.scheduleRenewal();
   }
 
   login(): void {
-    this.webAuth$
-      .pipe(first())
-      .subscribe(webAuth => webAuth.authorize());
+    this.webAuth$.pipe(first()).subscribe(webAuth => webAuth.authorize());
   }
 
   handleAuthentication(): void {
-    this.webAuth$
-      .pipe(first())
-      .subscribe(webAuth => webAuth.parseHash((err, authResult) => {
+    this.webAuth$.pipe(first()).subscribe(webAuth =>
+      webAuth.parseHash((err, authResult) => {
         if (err != undefined) {
           this.logger.error('Authentication error (see details for more info):', err);
           if (err instanceof Error) {
@@ -56,7 +58,8 @@ export class AuthService {
         }
 
         this.setSession(authResult || undefined, true); // the default is null so we need to convert it to undefined.
-      }));
+      })
+    );
   }
 
   logout(returnTo: string): void {
@@ -82,17 +85,21 @@ export class AuthService {
       return throwError(new Error('Access token must exist to fetch user info.'));
     }
 
-    return this.webAuth$
-      .pipe(
-        switchMap(webAuth => new Observable(observer => webAuth.client.userInfo(accessToken, (err, userInfo) => {
-          if (err) {
-            observer.error(err);
-          } else {
-            observer.next(userInfo);
-            observer.complete();
-          }
-        })))
-      );
+    return this.webAuth$.pipe(
+      switchMap(
+        webAuth =>
+          new Observable<any>(observer =>
+            webAuth.client.userInfo(accessToken, (err, userInfo) => {
+              if (err) {
+                observer.error(err);
+              } else {
+                observer.next(userInfo);
+                observer.complete();
+              }
+            })
+          )
+      )
+    );
   }
 
   isAuthenticated(): boolean {
@@ -110,9 +117,7 @@ export class AuthService {
     this.logger.info('Schedule the refresh of the tokens.');
     this.unscheduleRenewal();
     this.refreshSubscription = of(expiresAt)
-      .pipe(
-        switchMap(value => timer(Math.max(1, (value - Date.now()) / 2)))
-      )
+      .pipe(switchMap(value => timer(Math.max(1, (value - Date.now()) / 2))))
       .subscribe(() => this.renewAuthentication());
   }
 
@@ -125,33 +130,31 @@ export class AuthService {
   }
 
   private renewAuthentication(): void {
-    this.webAuth$
-      .pipe(first())
-      .subscribe(webAuth => {
-        this.logger.info('Renewing access token using silent authentication.');
-        const options: auth0.RenewAuthOptions = { redirectUri: `${window.location.origin}/silent-refresh.html`, usePostMessage: true };
-        webAuth.renewAuth(options, (err, result) => {
-          if (err != undefined) {
-            this.logger.error('Failed to renew access token (see details for more info):', err);
-            if (err instanceof Error) {
-              Sentry.captureException(err);
-            } else {
-              const error = err as auth0.Auth0Error;
-              Sentry.captureMessage(`[${error.error}] ${error.errorDescription}`, Sentry.Severity.Error);
-              // TODO: capture error.original ???
-            }
-
-            return;
+    this.webAuth$.pipe(first()).subscribe(webAuth => {
+      this.logger.info('Renewing access token using silent authentication.');
+      const options: auth0.RenewAuthOptions = { redirectUri: `${window.location.origin}/silent-refresh.html`, usePostMessage: true };
+      webAuth.renewAuth(options, (err, result) => {
+        if (err != undefined) {
+          this.logger.error('Failed to renew access token (see details for more info):', err);
+          if (err instanceof Error) {
+            Sentry.captureException(err);
+          } else {
+            const error = err;
+            Sentry.captureMessage(`[${error.error}] ${error.errorDescription}`, Sentry.Severity.Error);
+            // TODO: capture error.original ???
           }
 
-          this.setSession(result || undefined);
-        });
+          return;
+        }
+
+        this.setSession(result || undefined);
       });
+    });
   }
 
   private setSession(authResult?: auth0.Auth0DecodedHash, redirect: boolean = false): void {
     if (authResult && authResult.idToken && authResult.accessToken && authResult.expiresIn) {
-      const expiresAt = JSON.stringify(authResult.expiresIn * 1000 + Date.now())
+      const expiresAt = JSON.stringify(authResult.expiresIn * 1000 + Date.now());
       localStorage.setItem(ACCESS_TOKEN, authResult.accessToken);
       localStorage.setItem(ID_TOKEN, authResult.idToken);
       localStorage.setItem(EXPIRES_AT, expiresAt);
