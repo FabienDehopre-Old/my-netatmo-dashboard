@@ -56,6 +56,17 @@ namespace Netatmo.Dashboard.Api
             modelBuilder.Entity<User>().Property(e => e.Unit).IsRequired(false);
             modelBuilder.Entity<User>().Property(e => e.WindUnit).IsRequired(false);
             modelBuilder.Entity<User>().HasIndex(e => e.Uid).IsUnique();
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 1,
+                    Uid = "auth0|5c3369d9b171c101904570ca",
+                    Enabled = true,
+                    AccessToken = "56102b6fc6aa42f174e5d484|a2a52b7b24acfacf1718f69bbf226620",
+                    ExpiresAt = DateTimeOffset.FromUnixTimeMilliseconds(1550239201963).Date,
+                    RefreshToken = "56102b6fc6aa42f174e5d484|73d5b91c1cb4b021fddf91634be0a598"
+                }
+            );
         }
 
         private void ConfigureStationModel(ModelBuilder modelBuilder)

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Netatmo.Dashboard.Api.Hangfire;
@@ -25,6 +26,8 @@ namespace Netatmo.Dashboard.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<NetatmoDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
+
             services.AddCors(options => 
             {
                 var corsOptions = Configuration.GetSection("Cors").Get<CorsOptions>();
@@ -50,10 +53,10 @@ namespace Netatmo.Dashboard.Api
                 options.Audience = auth0Options.ApiIdentifier;
             });
 
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("read:values", policy => policy.Requirements.Add(new HasScopeRequirement("read:values", $"https://{auth0Options.Domain}/")));
-            });
+            //services.AddAuthorization(options =>
+            //{
+            //    options.AddPolicy("read:values", policy => policy.Requirements.Add(new HasScopeRequirement("read:values", $"https://{auth0Options.Domain}/")));
+            //});
 
             services.Configure<NetatmoOptions>(Configuration.GetSection("Netatmo"));
 
