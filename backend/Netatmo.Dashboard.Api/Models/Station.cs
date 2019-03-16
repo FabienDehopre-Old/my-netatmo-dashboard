@@ -16,5 +16,6 @@ namespace Netatmo.Dashboard.Api.Models
         public int UserId { get; set; }
         public virtual User User { get; set; }
         public virtual List<Device> Devices { get; set; }
+        public virtual Country Country { get; set; }
     }
 }

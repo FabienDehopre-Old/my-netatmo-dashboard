@@ -25,6 +25,7 @@ namespace Netatmo.Dashboard.Api
         public DbSet<Station> Stations { get; set; }
         public DbSet<Device> Devices { get; set; }
         public DbSet<DashboardData> DashboardData { get; set; }
+        public DbSet<Country> Countries { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -37,6 +38,7 @@ namespace Netatmo.Dashboard.Api
             ConfigureStationModel(modelBuilder);
             ConfigureDeviceModel(modelBuilder);
             ConfigureDashboardDataModel(modelBuilder);
+            ConfigureCountryModel(modelBuilder);
         }
 
         private void ConfigureUserModel(ModelBuilder modelBuilder)
@@ -72,6 +74,10 @@ namespace Netatmo.Dashboard.Api
                 .HasOne(e => e.User)
                 .WithMany(e => e.Stations)
                 .HasForeignKey(e => e.UserId);
+            modelBuilder.Entity<Station>()
+                .HasOne(e => e.Country)
+                .WithMany(e => e.Stations)
+                .HasForeignKey(e => e.CountryCode);
         }
 
         private void ConfigureDeviceModel(ModelBuilder modelBuilder)
@@ -150,6 +156,75 @@ namespace Netatmo.Dashboard.Api
             modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMaxTimestamp).IsRequired();
             modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(e => e.CO2).IsRequired();
             modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(e => e.Humidity).IsRequired();
+        }
+
+        private void ConfigureCountryModel(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Country>().HasKey(e => e.Code);
+            modelBuilder.Entity<Country>().Property(e => e.Code).IsRequired().IsUnicode().IsFixedLength().HasMaxLength(2);
+            modelBuilder.Entity<Country>().Property(e => e.Flag).IsRequired().IsUnicode().HasMaxLength(40);
+            modelBuilder.Entity<Country>().Property(n => n.NameEN).IsRequired().IsUnicode().HasMaxLength(256);
+            modelBuilder.Entity<Country>().Property(n => n.NameBR).IsRequired(false).IsUnicode().HasMaxLength(256);
+            modelBuilder.Entity<Country>().Property(n => n.NamePT).IsRequired(false).IsUnicode().HasMaxLength(256);
+            modelBuilder.Entity<Country>().Property(n => n.NameNL).IsRequired(false).IsUnicode().HasMaxLength(256);
+            modelBuilder.Entity<Country>().Property(n => n.NameHR).IsRequired(false).IsUnicode().HasMaxLength(256);
+            modelBuilder.Entity<Country>().Property(n => n.NameFA).IsRequired(false).IsUnicode().HasMaxLength(256);
+            modelBuilder.Entity<Country>().Property(n => n.NameDE).IsRequired(false).IsUnicode().HasMaxLength(256);
+            modelBuilder.Entity<Country>().Property(n => n.NameES).IsRequired(false).IsUnicode().HasMaxLength(256);
+            modelBuilder.Entity<Country>().Property(n => n.NameFR).IsRequired(false).IsUnicode().HasMaxLength(256);
+            modelBuilder.Entity<Country>().Property(n => n.NameJA).IsRequired(false).IsUnicode().HasMaxLength(256);
+            modelBuilder.Entity<Country>().Property(n => n.NameIT).IsRequired(false).IsUnicode().HasMaxLength(256);
+            modelBuilder.Entity<Country>().HasData(GetAllCountries().GetAwaiter().GetResult());
+        }
+
+        private async Task<Country[]> GetAllCountries()
+        {
+            using (var http = new HttpClient())
+            {
+                using (var response = await http.GetAsync("https://restcountries.eu/rest/v2/all?fields=alpha2Code;name;translations;flag"))
+                {
+                    response.EnsureSuccessStatusCode();
+                    var data = await response.Content.ReadAsAsync<RestCountry[]>();
+                    return data.Select(x => new Country
+                    {
+                        Code = x.alpha2Code,
+                        Flag = x.flag,
+                        NameEN = x.name,
+                        NameBR = x.translations.br,
+                        NamePT = x.translations.pt,
+                        NameNL = x.translations.nl,
+                        NameHR = x.translations.hr,
+                        NameFA = x.translations.fa,
+                        NameDE = x.translations.de,
+                        NameES = x.translations.es,
+                        NameFR = x.translations.fr,
+                        NameJA = x.translations.ja,
+                        NameIT = x.translations.it
+                    }).ToArray();
+                }
+            }
+        }
+
+        class RestCountry
+        {
+            public string alpha2Code { get; set; }
+            public string flag { get; set; }
+            public string name { get; set; }
+            public Translations translations { get; set; }
+        }
+
+        class Translations
+        {
+            public string br { get; set; }
+            public string pt { get; set; }
+            public string nl { get; set; }
+            public string hr { get; set; }
+            public string fa { get; set; }
+            public string de { get; set; }
+            public string es { get; set; }
+            public string fr { get; set; }
+            public string ja { get; set; }
+            public string it { get; set; }
         }
     }
 }
