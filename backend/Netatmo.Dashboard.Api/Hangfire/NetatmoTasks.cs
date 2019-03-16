@@ -27,7 +27,13 @@ namespace Netatmo.Dashboard.Api.Hangfire
             this.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public async Task FetchAndUpdate(string uid)
+        public void FetchAndUpdate(string uid)
+        {
+            var task = FetchAndUpdateAsync(uid);
+            task.GetAwaiter().GetResult();
+        }
+
+        private async Task FetchAndUpdateAsync(string uid)
         {
             var user = await db.Users
                 .Include(u => u.Stations)
@@ -38,26 +44,27 @@ namespace Netatmo.Dashboard.Api.Hangfire
                 var accessToken = await EnsureValidAccessToken(user);
                 var weatherData = await GetStationData(accessToken);
 
-                user.Units.FeelLike = (FeelLikeAlgo)weatherData.Body.User.AdminData.FeelLikeAlgo;
-                user.Units.PressureUnit = (PressureUnit)weatherData.Body.User.AdminData.PressureUnit;
-                user.Units.Unit = (Unit)weatherData.Body.User.AdminData.Unit;
-                user.Units.WindUnit = (WindUnit)weatherData.Body.User.AdminData.WindUnit;
+                user.FeelLike = (FeelLikeAlgo)weatherData.Body.User.AdminData.FeelLikeAlgo;
+                user.PressureUnit = (PressureUnit)weatherData.Body.User.AdminData.PressureUnit;
+                user.Unit = (Unit)weatherData.Body.User.AdminData.Unit;
+                user.WindUnit = (WindUnit)weatherData.Body.User.AdminData.WindUnit;
 
                 foreach (var deviceDto in weatherData.Body.Devices)
                 {
                     var station = user.Stations.SingleOrDefault(s => s.Devices.Select(d => d.Id).Contains(deviceDto.Id));
                     if (station == null)
                     {
-                        station = new Station { Devices = new List<Models.Device>(), Location = new Location() };
+                        station = new Station { Devices = new List<Models.Device>() };
                         user.Stations.Add(station);
                     }
 
                     station.Name = deviceDto.StationName;
-                    station.Location.Altitude = deviceDto.Place.Altitude;
-                    station.Location.City = deviceDto.Place.City;
-                    station.Location.Country = deviceDto.Place.Country;
-                    station.Location.GeoLocation = new GeoPoint { Latitude = deviceDto.Place.Location[0], Longitude = deviceDto.Place.Location[1] };
-                    station.Location.Timezone = deviceDto.Place.Timezone;
+                    station.Altitude = deviceDto.Place.Altitude;
+                    station.City = deviceDto.Place.City;
+                    station.CountryCode = deviceDto.Place.Country;
+                    station.Latitude = deviceDto.Place.Location[0];
+                    station.Longitude = deviceDto.Place.Location[1];
+                    station.Timezone = deviceDto.Place.Timezone;
 
                     var mainModule = station.Devices.OfType<MainDevice>().SingleOrDefault(d => d.Id == deviceDto.Id);
                     if (mainModule == null)
@@ -92,11 +99,8 @@ namespace Netatmo.Dashboard.Api.Hangfire
                         module.Name = moduleDto.ModuleName;
                         module.Firmware = moduleDto.FirmwareVersion;
                         module.RfStatus = moduleDto.RFStatus;
-                        module.Battery = new Battery
-                        {
-                            Vp = moduleDto.BatteryPower,
-                            Percent = moduleDto.BatteryPercentage
-                        };
+                        module.BatteryVp = moduleDto.BatteryPower;
+                        module.BatteryPercent = moduleDto.BatteryPercentage;
                         module.DashboardData.Add(Convert2ModuleDashboardData(moduleDto));
                     }
                 }
@@ -133,9 +137,11 @@ namespace Netatmo.Dashboard.Api.Hangfire
                 { "refresh_token", refreshToken }
             };
             httpClient.DefaultRequestHeaders.Authorization = null;
-            var response = await httpClient.PostAsync("https://api.netatmo.com/oauth2/token", new FormUrlEncodedContent(nameValueCollection));
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsAsync<Authorization>();
+            using (var response = await httpClient.PostAsync("https://api.netatmo.com/oauth2/token", new FormUrlEncodedContent(nameValueCollection)))
+            {
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadAsAsync<Authorization>();
+            }
         }
 
         private async Task<WeatherData> GetStationData(string accessToken)
@@ -145,9 +151,11 @@ namespace Netatmo.Dashboard.Api.Hangfire
                 { "access_token", accessToken }
             };
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            var response = await httpClient.PostAsync("https://api.netatmo.com/api/getstationsdata", new FormUrlEncodedContent(nameValueCollection));
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsAsync<WeatherData>();
+            using (var response = await httpClient.PostAsync("https://api.netatmo.com/api/getstationsdata", new FormUrlEncodedContent(nameValueCollection)))
+            {
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadAsAsync<WeatherData>();
+            }
         }
 
         private ModuleDeviceType ConvertToModuleType(ModuleType type)
@@ -172,27 +180,15 @@ namespace Netatmo.Dashboard.Api.Hangfire
             return new MainDashboardData
             {
                 TimeUtc = DateTimeOffset.FromUnixTimeSeconds(data.TimeUtc).DateTime,
-                Temperature = new TemperatureData
-                {
-                    Current = data.Temperature,
-                    Min = new TemperatureMinMax
-                    {
-                         Timestamp = DateTimeOffset.FromUnixTimeSeconds(data.MinTemperatureTimeUtc).DateTime,
-                         Value = data.MinTemperature
-                    },
-                    Max = new TemperatureMinMax
-                    {
-                        Timestamp = DateTimeOffset.FromUnixTimeSeconds(data.MaxTemperatureTimeUtc).DateTime,
-                        Value = data.MaxTemperature
-                    },
-                    Trend = (Models.Trend)data.TemperatureTrend
-                },
-                Pressure = new PressureData
-                {
-                    Value = data.Pressure,
-                    Absolute = data.AbsolutePressure,
-                    Trend = (Models.Trend)data.PressureTrend
-                },
+                Temperature = data.Temperature,
+                TemperatureMin = data.MinTemperature,
+                TemperatureMinTimestamp = DateTimeOffset.FromUnixTimeSeconds(data.MinTemperatureTimeUtc).DateTime,
+                TemperatureMax = data.MaxTemperature,
+                TemperatureMaxTimestamp = DateTimeOffset.FromUnixTimeSeconds(data.MaxTemperatureTimeUtc).DateTime,
+                TemperatureTrend = (Models.Trend)data.TemperatureTrend,
+                Pressure = data.Pressure,
+                AbsolutePressure = data.AbsolutePressure,
+                PressureTrend = (Models.Trend)data.PressureTrend,
                 CO2 = data.CO2,
                 Humidity = data.Humidity,
                 Noise = data.Noise
@@ -233,21 +229,12 @@ namespace Netatmo.Dashboard.Api.Hangfire
             return new OutdoorDashboardData
             {
                 TimeUtc = DateTimeOffset.FromUnixTimeSeconds(data.TimeUtc).DateTime,
-                Temperature = new TemperatureData
-                {
-                    Current = data.Temperature,
-                    Min = new TemperatureMinMax
-                    {
-                        Timestamp = DateTimeOffset.FromUnixTimeSeconds(data.MinTemperatureTimeUtc).DateTime,
-                        Value = data.MinTemperature
-                    },
-                    Max = new TemperatureMinMax
-                    {
-                        Timestamp = DateTimeOffset.FromUnixTimeSeconds(data.MaxTemperatureTimeUtc).DateTime,
-                        Value = data.MaxTemperature
-                    },
-                    Trend = (Models.Trend)data.TemperatureTrend
-                },
+                Temperature = data.Temperature,
+                TemperatureMin = data.MinTemperature,
+                TemperatureMinTimestamp = DateTimeOffset.FromUnixTimeSeconds(data.MinTemperatureTimeUtc).DateTime,
+                TemperatureMax = data.MaxTemperature,
+                TemperatureMaxTimestamp = DateTimeOffset.FromUnixTimeSeconds(data.MaxTemperatureTimeUtc).DateTime,
+                TemperatureTrend = (Models.Trend)data.TemperatureTrend,
                 Humidity = data.Humidity
             };
         }
@@ -280,21 +267,12 @@ namespace Netatmo.Dashboard.Api.Hangfire
             return new IndoorDashboardData
             {
                 TimeUtc = DateTimeOffset.FromUnixTimeSeconds(data.TimeUtc).DateTime,
-                Temperature = new TemperatureData
-                {
-                    Current = data.Temperature,
-                    Min = new TemperatureMinMax
-                    {
-                        Timestamp = DateTimeOffset.FromUnixTimeSeconds(data.MinTemperatureTimeUtc).DateTime,
-                        Value = data.MinTemperature
-                    },
-                    Max = new TemperatureMinMax
-                    {
-                        Timestamp = DateTimeOffset.FromUnixTimeSeconds(data.MaxTemperatureTimeUtc).DateTime,
-                        Value = data.MaxTemperature
-                    },
-                    Trend = (Models.Trend)data.TemperatureTrend
-                },
+                Temperature = data.Temperature,
+                TemperatureMin = data.MinTemperature,
+                TemperatureMinTimestamp = DateTimeOffset.FromUnixTimeSeconds(data.MinTemperatureTimeUtc).DateTime,
+                TemperatureMax = data.MaxTemperature,
+                TemperatureMaxTimestamp = DateTimeOffset.FromUnixTimeSeconds(data.MaxTemperatureTimeUtc).DateTime,
+                TemperatureTrend = (Models.Trend)data.TemperatureTrend,
                 CO2 = data.CO2,
                 Humidity = data.Humidity
             };

@@ -12,8 +12,15 @@ namespace Netatmo.Dashboard.Api.Models
 
     public class MainDashboardData : DashboardData
     {
-        public virtual TemperatureData Temperature { get; set; }
-        public virtual PressureData Pressure { get; set; }
+        public decimal Temperature { get; set; }
+        public decimal TemperatureMin { get; set; }
+        public DateTime TemperatureMinTimestamp { get; set; }
+        public decimal TemperatureMax { get; set; }
+        public DateTime TemperatureMaxTimestamp { get; set; }
+        public Trend TemperatureTrend { get; set; }
+        public decimal Pressure { get; set; }
+        public decimal AbsolutePressure { get; set; }
+        public Trend PressureTrend { get; set; }
         public int CO2 { get; set; }
         public int Humidity { get; set; }
         public int Noise { get; set; }
@@ -21,7 +28,12 @@ namespace Netatmo.Dashboard.Api.Models
 
     public class OutdoorDashboardData : DashboardData
     {
-        public virtual TemperatureData Temperature { get; set; }
+        public decimal Temperature { get; set; }
+        public decimal TemperatureMin { get; set; }
+        public DateTime TemperatureMinTimestamp { get; set; }
+        public decimal TemperatureMax { get; set; }
+        public DateTime TemperatureMaxTimestamp { get; set; }
+        public Trend TemperatureTrend { get; set; }
         public int Humidity { get; set; }
     }
 
@@ -42,7 +54,12 @@ namespace Netatmo.Dashboard.Api.Models
 
     public class IndoorDashboardData : DashboardData
     {
-        public virtual TemperatureData Temperature { get; set; }
+        public decimal Temperature { get; set; }
+        public decimal TemperatureMin { get; set; }
+        public DateTime TemperatureMinTimestamp { get; set; }
+        public decimal TemperatureMax { get; set; }
+        public DateTime TemperatureMaxTimestamp { get; set; }
+        public Trend TemperatureTrend { get; set; }
         public int CO2 { get; set; }
         public int Humidity { get; set; }
     }

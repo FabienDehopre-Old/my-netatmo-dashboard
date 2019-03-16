@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Netatmo.Dashboard.Api.Models;
 
 namespace Netatmo.Dashboard.Api
@@ -45,10 +49,10 @@ namespace Netatmo.Dashboard.Api
             modelBuilder.Entity<User>().Property(e => e.ExpiresAt).IsRequired(false);
             modelBuilder.Entity<User>().Property(e => e.RefreshToken).IsUnicode().HasMaxLength(64);
             modelBuilder.Entity<User>().Property(e => e.UpdateJobId).IsUnicode().HasMaxLength(100).IsRequired(false);
-            modelBuilder.Entity<User>().OwnsOne(e => e.Units).Property(u => u.FeelLike).IsRequired(false);
-            modelBuilder.Entity<User>().OwnsOne(e => e.Units).Property(u => u.PressureUnit).IsRequired(false);
-            modelBuilder.Entity<User>().OwnsOne(e => e.Units).Property(u => u.Unit).IsRequired(false);
-            modelBuilder.Entity<User>().OwnsOne(e => e.Units).Property(u => u.WindUnit).IsRequired(false);
+            modelBuilder.Entity<User>().Property(e => e.FeelLike).IsRequired(false);
+            modelBuilder.Entity<User>().Property(e => e.PressureUnit).IsRequired(false);
+            modelBuilder.Entity<User>().Property(e => e.Unit).IsRequired(false);
+            modelBuilder.Entity<User>().Property(e => e.WindUnit).IsRequired(false);
             modelBuilder.Entity<User>().HasIndex(e => e.Uid).IsUnique();
         }
 
@@ -57,13 +61,13 @@ namespace Netatmo.Dashboard.Api
             modelBuilder.Entity<Station>().HasKey(e => e.Id);
             modelBuilder.Entity<Station>().Property(e => e.Id).UseSqlServerIdentityColumn();
             modelBuilder.Entity<Station>().Property(e => e.Name).IsRequired().IsUnicode().HasMaxLength(256);
-            modelBuilder.Entity<Station>().OwnsOne(e => e.Location).Property(l => l.Altitude).IsRequired();
-            modelBuilder.Entity<Station>().OwnsOne(e => e.Location).Property(l => l.City).IsRequired().IsUnicode().HasMaxLength(256);
-            modelBuilder.Entity<Station>().OwnsOne(e => e.Location).Property(l => l.Country).IsRequired().IsUnicode().HasMaxLength(256);
-            modelBuilder.Entity<Station>().OwnsOne(e => e.Location).OwnsOne(l => l.GeoLocation).Property(l => l.Latitude).IsRequired();
-            modelBuilder.Entity<Station>().OwnsOne(e => e.Location).OwnsOne(l => l.GeoLocation).Property(l => l.Longitude).IsRequired();
-            modelBuilder.Entity<Station>().OwnsOne(e => e.Location).Property(l => l.Timezone).IsRequired().IsUnicode().HasMaxLength(32);
-            modelBuilder.Entity<Station>().OwnsOne(e => e.Location).Property(l => l.StaticMap).IsRequired(false).IsUnicode().HasMaxLength(1024);
+            modelBuilder.Entity<Station>().Property(e => e.Altitude).IsRequired();
+            modelBuilder.Entity<Station>().Property(e => e.City).IsRequired().IsUnicode().HasMaxLength(256);
+            modelBuilder.Entity<Station>().Property(e => e.CountryCode).IsRequired().IsUnicode().IsFixedLength().HasMaxLength(2);
+            modelBuilder.Entity<Station>().Property(e => e.Latitude).IsRequired();
+            modelBuilder.Entity<Station>().Property(e => e.Longitude).IsRequired();
+            modelBuilder.Entity<Station>().Property(e => e.Timezone).IsRequired().IsUnicode().HasMaxLength(32);
+            modelBuilder.Entity<Station>().Property(e => e.StaticMap).IsRequired(false).IsUnicode().HasMaxLength(1024);
             modelBuilder.Entity<Station>()
                 .HasOne(e => e.User)
                 .WithMany(e => e.Stations)
@@ -86,8 +90,8 @@ namespace Netatmo.Dashboard.Api
                 .HasValue<ModuleDevice>("module");
             modelBuilder.Entity<MainDevice>().HasBaseType<Device>().Property(e => e.WifiStatus).IsRequired();
             modelBuilder.Entity<ModuleDevice>().HasBaseType<Device>().Property(e => e.RfStatus).IsRequired();
-            modelBuilder.Entity<ModuleDevice>().HasBaseType<Device>().OwnsOne(e => e.Battery).Property(b => b.Percent).IsRequired();
-            modelBuilder.Entity<ModuleDevice>().HasBaseType<Device>().OwnsOne(e => e.Battery).Property(b => b.Vp).IsRequired();
+            modelBuilder.Entity<ModuleDevice>().HasBaseType<Device>().Property(b => b.BatteryPercent).IsRequired();
+            modelBuilder.Entity<ModuleDevice>().HasBaseType<Device>().Property(b => b.BatteryVp).IsRequired();
             modelBuilder.Entity<ModuleDevice>().HasBaseType<Device>().Property(e => e.Type).IsRequired();
         }
 
@@ -107,38 +111,43 @@ namespace Netatmo.Dashboard.Api
                 .HasValue<WindGaugeDashboardData>("NAModule2")
                 .HasValue<RainGaugeDashboardData>("NAModule3")
                 .HasValue<IndoorDashboardData>("NAModule4");
-            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).Property(t => t.Current).IsRequired();
-            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).Property(t => t.Trend).IsRequired();
-            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).OwnsOne(t => t.Max).Property(x => x.Value).IsRequired();
-            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).OwnsOne(t => t.Max).Property(x => x.Timestamp).IsRequired();
-            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).OwnsOne(t => t.Min).Property(x => x.Value).IsRequired();
-            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).OwnsOne(t => t.Min).Property(x => x.Timestamp).IsRequired();
-            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Pressure).Property(e => e.Value).IsRequired();
-            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Pressure).Property(e => e.Absolute).IsRequired();
-            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Pressure).Property(e => e.Trend).IsRequired();
+
+            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(t => t.Temperature).IsRequired();
+            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(t => t.TemperatureTrend).IsRequired();
+            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMin).IsRequired();
+            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMinTimestamp).IsRequired();
+            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMax).IsRequired();
+            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMaxTimestamp).IsRequired();
+            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(e => e.Pressure).IsRequired();
+            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(e => e.AbsolutePressure).IsRequired();
+            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(e => e.PressureTrend).IsRequired();
             modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(e => e.CO2).IsRequired();
             modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(e => e.Humidity).IsRequired();
             modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(e => e.Noise).IsRequired();
-            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).Property(t => t.Current).IsRequired();
-            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).Property(t => t.Trend).IsRequired();
-            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).OwnsOne(t => t.Max).Property(x => x.Value).IsRequired();
-            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).OwnsOne(t => t.Max).Property(x => x.Timestamp).IsRequired();
-            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).OwnsOne(t => t.Min).Property(x => x.Value).IsRequired();
-            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).OwnsOne(t => t.Min).Property(x => x.Timestamp).IsRequired();
+
+            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(t => t.Temperature).IsRequired();
+            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(t => t.TemperatureTrend).IsRequired();
+            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMin).IsRequired();
+            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMinTimestamp).IsRequired();
+            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMax).IsRequired();
+            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMaxTimestamp).IsRequired();
             modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(e => e.Humidity).IsRequired();
+
             modelBuilder.Entity<WindGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.WindStrength).IsRequired();
             modelBuilder.Entity<WindGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.WindAngle).IsRequired();
             modelBuilder.Entity<WindGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.GustStrength).IsRequired();
             modelBuilder.Entity<WindGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.GustAngle).IsRequired();
+
             modelBuilder.Entity<RainGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.Rain).IsRequired();
             modelBuilder.Entity<RainGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.Sum1H).IsRequired();
             modelBuilder.Entity<RainGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.Sum24H).IsRequired();
-            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).Property(t => t.Current).IsRequired();
-            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).Property(t => t.Trend).IsRequired();
-            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).OwnsOne(t => t.Max).Property(x => x.Value).IsRequired();
-            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).OwnsOne(t => t.Max).Property(x => x.Timestamp).IsRequired();
-            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).OwnsOne(t => t.Min).Property(x => x.Value).IsRequired();
-            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().OwnsOne(e => e.Temperature).OwnsOne(t => t.Min).Property(x => x.Timestamp).IsRequired();
+
+            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(t => t.Temperature).IsRequired();
+            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(t => t.TemperatureTrend).IsRequired();
+            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMin).IsRequired();
+            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMinTimestamp).IsRequired();
+            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMax).IsRequired();
+            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMaxTimestamp).IsRequired();
             modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(e => e.CO2).IsRequired();
             modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(e => e.Humidity).IsRequired();
         }

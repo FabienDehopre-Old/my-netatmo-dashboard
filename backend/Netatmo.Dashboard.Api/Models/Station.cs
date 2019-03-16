@@ -6,7 +6,13 @@ namespace Netatmo.Dashboard.Api.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public virtual Location Location { get; set; }
+        public decimal Altitude { get; set; }
+        public string City { get; set; }
+        public string CountryCode { get; set; }
+        public decimal Latitude { get; set; }
+        public decimal Longitude { get; set; }
+        public string Timezone { get; set; }
+        public string StaticMap { get; set; }
         public int UserId { get; set; }
         public virtual User User { get; set; }
         public virtual List<Device> Devices { get; set; }

@@ -11,8 +11,11 @@ namespace Netatmo.Dashboard.Api.Models
         public string AccessToken { get; set; }
         public DateTime? ExpiresAt { get; set; }
         public string RefreshToken { get; set; }
-        public virtual List<Station> Stations { get; set; }
         public string UpdateJobId { get; set; }
-        public virtual Units Units { get; set; }
+        public FeelLikeAlgo? FeelLike { get; set; }
+        public PressureUnit? PressureUnit { get; set; }
+        public Unit? Unit { get; set; }
+        public WindUnit? WindUnit { get; set; }
+        public virtual List<Station> Stations { get; set; }
     }
 }
