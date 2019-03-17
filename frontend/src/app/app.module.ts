@@ -11,8 +11,11 @@ import { AppComponent } from './app.component';
 import { LayoutComponent } from './components/layout/layout.component';
 import { MaterialModule } from './material.module';
 import { CallbackComponent } from './pages/callback/callback.component';
+import { EmailVerifiedComponent } from './pages/email-verified/email-verified.component';
 import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
+import { SignupSuccessComponent } from './pages/signup-success/signup-success.component';
+import { AltitudePipe } from './pipes/altitude.pipe';
 import { AuthInterceptor } from './services/auth.interceptor';
 import { ConfigService } from './services/config.service';
 import { SentryErrorHandler } from './services/sentry-error-handler';
@@ -29,7 +32,16 @@ export function initApp(configService: ConfigService): () => void {
 }
 
 @NgModule({
-  declarations: [AppComponent, HomeComponent, CallbackComponent, LoginComponent, LayoutComponent],
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    CallbackComponent,
+    LoginComponent,
+    LayoutComponent,
+    AltitudePipe,
+    SignupSuccessComponent,
+    EmailVerifiedComponent,
+  ],
   imports: [BrowserAnimationsModule, AppRoutingModule, HttpClientModule, MaterialModule],
   providers: [
     { provide: ErrorHandler, useClass: SentryErrorHandler },

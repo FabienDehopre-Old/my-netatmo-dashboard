@@ -1,0 +1,17 @@
+<app-layout>
+  <mat-card>
+    <mat-card-title>Successful sign up</mat-card-title>
+    <mat-card-content>
+      <p>You successfully signed up to <strong>My Netatmo Dashboard</strong>.</p>
+      <p>In order to continue, you need to validate your e-mail address by clicking the link in the verification e-mail.</p>
+      <p>
+        If you didn't receive the verification e-mail, first check your spam and if you still cannot find the mail, click the button below
+        to resend it.
+      </p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button (click)="resendVerificationEmail()">Resend verification e-mail</button>
+      <button mat-raised-button color="primary" (click)="continueToDashboard()">I verified my e-mail, continue to dashboard</button>
+    </mat-card-actions>
+  </mat-card>
+</app-layout>

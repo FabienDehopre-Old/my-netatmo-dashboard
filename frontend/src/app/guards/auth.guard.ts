@@ -10,7 +10,8 @@ import {
   UrlSegment,
 } from '@angular/router';
 
-import { AuthService, RETURN_URL } from '../services/auth.service';
+import { RETURN_URL } from '../models/consts';
+import { AuthService } from '../services/auth.service';
 
 @Injectable({
   providedIn: 'root',

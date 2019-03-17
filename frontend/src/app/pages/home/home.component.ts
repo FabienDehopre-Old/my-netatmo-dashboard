@@ -13,8 +13,9 @@ export class HomeComponent {
   constructor(private readonly http: HttpClient) {}
 
   callApi(): void {
-    this.http.get('https://localhost:44388/api/values')
+    this.http
+      .get('https://localhost:44388/api/user/ensure')
       .pipe(first())
-      .subscribe(values => this.result = values);
+      .subscribe(values => (this.result = values));
   }
 }

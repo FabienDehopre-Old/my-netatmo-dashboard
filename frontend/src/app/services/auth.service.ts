@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import * as Sentry from '@sentry/browser';
@@ -5,13 +6,10 @@ import * as auth0 from 'auth0-js';
 import { Observable, of, Subscription, throwError, timer } from 'rxjs';
 import { first, map, switchMap, withLatestFrom } from 'rxjs/operators';
 
+import { ACCESS_TOKEN, EXPIRES_AT, ID_TOKEN, RETURN_URL } from '../models/consts';
+
 import { ConfigService } from './config.service';
 import { LoggerService } from './logger.service';
-
-export const ID_TOKEN = 'id_token';
-export const ACCESS_TOKEN = 'access_token';
-export const EXPIRES_AT = 'expires_at';
-export const RETURN_URL = 'return_url';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +18,12 @@ export class AuthService {
   private readonly webAuth$: Observable<auth0.WebAuth>;
   private refreshSubscription?: Subscription;
 
-  constructor(private readonly configService: ConfigService, private readonly logger: LoggerService, private readonly router: Router) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly logger: LoggerService,
+    private readonly router: Router,
+    private readonly http: HttpClient
+  ) {
     this.webAuth$ = this.configService.config$.pipe(
       map(
         config =>
@@ -30,7 +33,7 @@ export class AuthService {
             responseType: 'token id_token',
             audience: 'https://netatmo.dehopre.com/api',
             redirectUri: `${window.location.origin}/callback`,
-            scope: 'openid profile email read:values',
+            scope: 'openid profile email update:users',
           })
       )
     );
@@ -50,8 +53,7 @@ export class AuthService {
             Sentry.captureException(err);
           } else {
             const error = err as auth0.Auth0Error;
-            Sentry.captureMessage(`[${error.error}] ${error.errorDescription}`, Sentry.Severity.Error);
-            // TODO: capture error.original ???
+            Sentry.captureException(error.original || error);
           }
 
           return;
@@ -79,7 +81,7 @@ export class AuthService {
       });
   }
 
-  getUserInfo(): Observable<any> {
+  getUserInfo(): Observable<auth0.Auth0UserProfile> {
     const accessToken = localStorage.getItem(ACCESS_TOKEN);
     if (!accessToken) {
       return throwError(new Error('Access token must exist to fetch user info.'));
@@ -88,7 +90,7 @@ export class AuthService {
     return this.webAuth$.pipe(
       switchMap(
         webAuth =>
-          new Observable<any>(observer =>
+          new Observable<auth0.Auth0UserProfile>(observer =>
             webAuth.client.userInfo(accessToken, (err, userInfo) => {
               if (err) {
                 observer.error(err);
@@ -105,6 +107,14 @@ export class AuthService {
   isAuthenticated(): boolean {
     const expiresAt = JSON.parse(localStorage.getItem(EXPIRES_AT) || '0');
     return expiresAt > Date.now();
+  }
+
+  resendVerificationEmail(): Observable<void> {
+    return this.configService.config$
+      .pipe(
+        switchMap(config => this.http.post(`${config.apiBaseUrl}/user/verification-email`, {})),
+        map(() => void(0))
+      );
   }
 
   private scheduleRenewal(): void {
