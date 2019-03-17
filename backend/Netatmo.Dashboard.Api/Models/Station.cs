@@ -6,7 +6,7 @@ namespace Netatmo.Dashboard.Api.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public decimal Altitude { get; set; }
+        public int Altitude { get; set; }
         public string City { get; set; }
         public string CountryCode { get; set; }
         public decimal Latitude { get; set; }

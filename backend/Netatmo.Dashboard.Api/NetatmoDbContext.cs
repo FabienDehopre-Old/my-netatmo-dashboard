@@ -77,8 +77,8 @@ namespace Netatmo.Dashboard.Api
             modelBuilder.Entity<Station>().Property(e => e.Altitude).IsRequired();
             modelBuilder.Entity<Station>().Property(e => e.City).IsRequired().IsUnicode().HasMaxLength(256);
             modelBuilder.Entity<Station>().Property(e => e.CountryCode).IsRequired().IsUnicode().IsFixedLength().HasMaxLength(2);
-            modelBuilder.Entity<Station>().Property(e => e.Latitude).IsRequired();
-            modelBuilder.Entity<Station>().Property(e => e.Longitude).IsRequired();
+            modelBuilder.Entity<Station>().Property(e => e.Latitude).IsRequired().HasColumnType("decimal(9,7)");
+            modelBuilder.Entity<Station>().Property(e => e.Longitude).IsRequired().HasColumnType("decimal(10,7)");
             modelBuilder.Entity<Station>().Property(e => e.Timezone).IsRequired().IsUnicode().HasMaxLength(32);
             modelBuilder.Entity<Station>().Property(e => e.StaticMap).IsRequired(false).IsUnicode().HasMaxLength(1024);
             modelBuilder.Entity<Station>()
@@ -129,41 +129,41 @@ namespace Netatmo.Dashboard.Api
                 .HasValue<RainGaugeDashboardData>("NAModule3")
                 .HasValue<IndoorDashboardData>("NAModule4");
 
-            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(t => t.Temperature).IsRequired();
+            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(t => t.Temperature).IsRequired().HasColumnType("decimal(4,1)");
             modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(t => t.TemperatureTrend).IsRequired();
-            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMin).IsRequired();
+            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMin).IsRequired().HasColumnType("decimal(4,1)");
             modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMinTimestamp).IsRequired();
-            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMax).IsRequired();
+            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMax).IsRequired().HasColumnType("decimal(4,1)");
             modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMaxTimestamp).IsRequired();
-            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(e => e.Pressure).IsRequired();
-            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(e => e.AbsolutePressure).IsRequired();
+            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(e => e.Pressure).IsRequired().HasColumnType("decimal(5,1)");
+            modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(e => e.AbsolutePressure).IsRequired().HasColumnType("decimal(5,1)");
             modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(e => e.PressureTrend).IsRequired();
             modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(e => e.CO2).IsRequired();
             modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(e => e.Humidity).IsRequired();
             modelBuilder.Entity<MainDashboardData>().HasBaseType<DashboardData>().Property(e => e.Noise).IsRequired();
 
-            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(t => t.Temperature).IsRequired();
+            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(t => t.Temperature).IsRequired().HasColumnType("decimal(4,1)");
             modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(t => t.TemperatureTrend).IsRequired();
-            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMin).IsRequired();
+            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMin).IsRequired().HasColumnType("decimal(4,1)");
             modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMinTimestamp).IsRequired();
-            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMax).IsRequired();
+            modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMax).IsRequired().HasColumnType("decimal(4,1)");
             modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMaxTimestamp).IsRequired();
             modelBuilder.Entity<OutdoorDashboardData>().HasBaseType<DashboardData>().Property(e => e.Humidity).IsRequired();
 
-            modelBuilder.Entity<WindGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.WindStrength).IsRequired();
+            modelBuilder.Entity<WindGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.WindStrength).IsRequired().HasColumnType("decimal(5,2)"); ;
             modelBuilder.Entity<WindGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.WindAngle).IsRequired();
-            modelBuilder.Entity<WindGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.GustStrength).IsRequired();
+            modelBuilder.Entity<WindGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.GustStrength).IsRequired().HasColumnType("decimal(5,2)"); ;
             modelBuilder.Entity<WindGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.GustAngle).IsRequired();
 
-            modelBuilder.Entity<RainGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.Rain).IsRequired();
-            modelBuilder.Entity<RainGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.Sum1H).IsRequired();
-            modelBuilder.Entity<RainGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.Sum24H).IsRequired();
+            modelBuilder.Entity<RainGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.Rain).IsRequired().HasColumnType("decimal(5,1)");
+            modelBuilder.Entity<RainGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.Sum1H).IsRequired().HasColumnType("decimal(5,1)");
+            modelBuilder.Entity<RainGaugeDashboardData>().HasBaseType<DashboardData>().Property(e => e.Sum24H).IsRequired().HasColumnType("decimal(5,1)");
 
-            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(t => t.Temperature).IsRequired();
+            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(t => t.Temperature).IsRequired().HasColumnType("decimal(4,1)");
             modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(t => t.TemperatureTrend).IsRequired();
-            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMin).IsRequired();
+            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMin).IsRequired().HasColumnType("decimal(4,1)");
             modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMinTimestamp).IsRequired();
-            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMax).IsRequired();
+            modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMax).IsRequired().HasColumnType("decimal(4,1)");
             modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(x => x.TemperatureMaxTimestamp).IsRequired();
             modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(e => e.CO2).IsRequired();
             modelBuilder.Entity<IndoorDashboardData>().HasBaseType<DashboardData>().Property(e => e.Humidity).IsRequired();
