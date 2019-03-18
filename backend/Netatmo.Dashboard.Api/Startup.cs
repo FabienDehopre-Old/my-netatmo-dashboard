@@ -1,4 +1,7 @@
-﻿using Hangfire;
+﻿using GraphiQl;
+using GraphQL;
+using GraphQL.Types;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -8,7 +11,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Netatmo.Dashboard.Api.Hangfire;
+using Netatmo.Dashboard.Api.Helpers;
 using Netatmo.Dashboard.Api.Options;
+using Netatmo.Dashboard.Api.Repositories;
+using Netatmo.Dashboard.Api.Schema;
 using System;
 using System.Net.Http;
 
@@ -39,6 +45,7 @@ namespace Netatmo.Dashboard.Api
                                       .WithHeaders(corsOptions.AllowedHeaders)
                 );
             });
+            services.AddHttpContextAccessor();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2); 
             services.AddHangfire(config => config.UseSqlServerStorage(Configuration.GetConnectionString("Default")));
 
@@ -65,6 +72,15 @@ namespace Netatmo.Dashboard.Api
             services.AddScoped<NetatmoDbContext>();
             services.AddScoped<NetatmoTasks>();
             services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
+            services.AddSingleton<ContextServiceLocator>();
+            services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
+            services.AddTransient<IStationRepository, StationRepository>();
+            services.AddTransient<ICountryRepository, CountryRepository>();
+            services.AddSingleton<NetatmoQuery>();
+            services.AddSingleton<StationType>();
+            services.AddSingleton<CountryType>();
+            var sp = services.BuildServiceProvider();
+            services.AddSingleton<ISchema>(new NetatmoSchema(new FuncDependencyResolver(type => sp.GetService(type))));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -82,15 +98,16 @@ namespace Netatmo.Dashboard.Api
                 app.UseHsts();
             }
 
+            GlobalConfiguration.Configuration.UseActivator(new HangfireActivator(serviceProvider));
+            app.UseHangfireDashboard();
+            app.UseHangfireServer();
+
+            app.UseGraphiQl();
+
             app.UseCors();
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseMvc();
-
-            GlobalConfiguration.Configuration.UseActivator(new HangfireActivator(serviceProvider));
-            app.UseHangfireDashboard();
-            app.UseHangfireServer();
-            
         }
     }
 }
