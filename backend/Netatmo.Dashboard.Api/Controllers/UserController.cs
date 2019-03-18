@@ -72,18 +72,25 @@ namespace Netatmo.Dashboard.Api.Controllers
 
             if (string.IsNullOrWhiteSpace(user.UpdateJobId))
             {
+                // Enable the refresh of the data from Netatmo API
+                if (string.IsNullOrWhiteSpace(user.AccessToken) || (user.ExpiresAt.HasValue && user.ExpiresAt.Value <= DateTime.Now))
+                {
+                    return Conflict("You have not authorized the application to access the Netatmo API on your behalf.");
+                }
+
                 var jobId = $"fetch-update-{user.Uid}";
                 RecurringJob.AddOrUpdate<NetatmoTasks>(jobId, x => x.FetchAndUpdate(user.Uid), Cron.MinuteInterval(15));
                 user.UpdateJobId = jobId;
             }
             else
             {
+                // Disable the refresh of the data from Netatmo API
                 RecurringJob.RemoveIfExists(user.UpdateJobId);
                 user.UpdateJobId = null;
             }
 
             await db.SaveChangesAsync();
-            return !string.IsNullOrWhiteSpace(user.UpdateJobId);
+            return Accepted(!string.IsNullOrWhiteSpace(user.UpdateJobId));
         }
 
         private async Task<string> GetManagementApiAccessToken()
