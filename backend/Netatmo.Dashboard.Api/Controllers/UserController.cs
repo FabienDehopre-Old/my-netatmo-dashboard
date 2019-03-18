@@ -4,10 +4,12 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Auth0.ManagementApi;
 using Auth0.ManagementApi.Models;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Netatmo.Dashboard.Api.Hangfire;
 using Netatmo.Dashboard.Api.Options;
 
 namespace Netatmo.Dashboard.Api.Controllers
@@ -20,18 +22,19 @@ namespace Netatmo.Dashboard.Api.Controllers
         private readonly NetatmoDbContext db;
         private readonly HttpClient httpClient;
         private readonly Auth0Options options;
+        private readonly string uid;
 
         public UserController(NetatmoDbContext db, HttpClient httpClient, IOptionsMonitor<Auth0Options> options)
         {
             this.db = db ?? throw new ArgumentNullException(nameof(db));
             this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             this.options = (options ?? throw new ArgumentNullException(nameof(options))).CurrentValue;
+            uid = User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
 
         [HttpGet("ensure")]
         public async Task<bool> EnsureUserCreated()
         {
-            var uid = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var user = await db.Users.SingleOrDefaultAsync(u => u.Uid == uid);
             if (user == null)
             {
@@ -49,7 +52,6 @@ namespace Netatmo.Dashboard.Api.Controllers
         [HttpPost("verification-email")]
         public async Task<string> ResendVerificationEmail()
         {
-            var uid = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var token = await GetManagementApiAccessToken();
             var client = new ManagementApiClient(token, options.Domain);
             var job = await client.Jobs.SendVerificationEmailAsync(new VerifyEmailJobRequest
@@ -57,6 +59,31 @@ namespace Netatmo.Dashboard.Api.Controllers
                 UserId = uid
             });
             return job.Id;
+        }
+
+        [HttpPost("toggle-update-job")]
+        public async Task<ActionResult<bool>> ToggleFetchAndUpdateJob()
+        {
+            var user = await db.Users.SingleOrDefaultAsync(u => u.Uid == uid);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            if (string.IsNullOrWhiteSpace(user.UpdateJobId))
+            {
+                var jobId = $"fetch-update-{user.Uid}";
+                RecurringJob.AddOrUpdate<NetatmoTasks>(jobId, x => x.FetchAndUpdate(user.Uid), Cron.MinuteInterval(15));
+                user.UpdateJobId = jobId;
+            }
+            else
+            {
+                RecurringJob.RemoveIfExists(user.UpdateJobId);
+                user.UpdateJobId = null;
+            }
+
+            await db.SaveChangesAsync();
+            return !string.IsNullOrWhiteSpace(user.UpdateJobId);
         }
 
         private async Task<string> GetManagementApiAccessToken()
