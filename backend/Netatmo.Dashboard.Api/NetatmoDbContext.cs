@@ -46,7 +46,6 @@ namespace Netatmo.Dashboard.Api
             modelBuilder.Entity<User>().HasKey(e => e.Id);
             modelBuilder.Entity<User>().Property(e => e.Id).UseSqlServerIdentityColumn();
             modelBuilder.Entity<User>().Property(e => e.Uid).IsRequired().IsUnicode().HasMaxLength(64);
-            modelBuilder.Entity<User>().Property(e => e.Enabled).IsRequired().HasDefaultValue(false);
             modelBuilder.Entity<User>().Property(e => e.AccessToken).IsUnicode().HasMaxLength(64);
             modelBuilder.Entity<User>().Property(e => e.ExpiresAt).IsRequired(false);
             modelBuilder.Entity<User>().Property(e => e.RefreshToken).IsUnicode().HasMaxLength(64);
@@ -61,7 +60,6 @@ namespace Netatmo.Dashboard.Api
                 {
                     Id = 1,
                     Uid = "auth0|5c3369d9b171c101904570ca",
-                    Enabled = true,
                     AccessToken = "56102b6fc6aa42f174e5d484|a2a52b7b24acfacf1718f69bbf226620",
                     ExpiresAt = DateTimeOffset.FromUnixTimeMilliseconds(1550239201963).Date,
                     RefreshToken = "56102b6fc6aa42f174e5d484|73d5b91c1cb4b021fddf91634be0a598"

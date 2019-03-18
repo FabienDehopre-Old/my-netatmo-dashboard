@@ -38,75 +38,72 @@ namespace Netatmo.Dashboard.Api.Hangfire
             var user = await db.Users
                 .Include(u => u.Stations)
                 .ThenInclude(s => s.Devices)
-                .SingleOrDefaultAsync(u => u.Uid == uid);
-            if (user != null && user.Enabled)
+                .SingleAsync(u => u.Uid == uid);
+            var accessToken = await EnsureValidAccessToken(user);
+            var weatherData = await GetStationData(accessToken);
+
+            user.FeelLike = (FeelLikeAlgo)weatherData.Body.User.AdminData.FeelLikeAlgo;
+            user.PressureUnit = (PressureUnit)weatherData.Body.User.AdminData.PressureUnit;
+            user.Unit = (Unit)weatherData.Body.User.AdminData.Unit;
+            user.WindUnit = (WindUnit)weatherData.Body.User.AdminData.WindUnit;
+
+            foreach (var deviceDto in weatherData.Body.Devices)
             {
-                var accessToken = await EnsureValidAccessToken(user);
-                var weatherData = await GetStationData(accessToken);
-
-                user.FeelLike = (FeelLikeAlgo)weatherData.Body.User.AdminData.FeelLikeAlgo;
-                user.PressureUnit = (PressureUnit)weatherData.Body.User.AdminData.PressureUnit;
-                user.Unit = (Unit)weatherData.Body.User.AdminData.Unit;
-                user.WindUnit = (WindUnit)weatherData.Body.User.AdminData.WindUnit;
-
-                foreach (var deviceDto in weatherData.Body.Devices)
+                var station = user.Stations.SingleOrDefault(s => s.Devices.Select(d => d.Id).Contains(deviceDto.Id));
+                if (station == null)
                 {
-                    var station = user.Stations.SingleOrDefault(s => s.Devices.Select(d => d.Id).Contains(deviceDto.Id));
-                    if (station == null)
-                    {
-                        station = new Station { Devices = new List<Models.Device>() };
-                        user.Stations.Add(station);
-                    }
-
-                    station.Name = deviceDto.StationName;
-                    station.Altitude = deviceDto.Place.Altitude;
-                    station.City = deviceDto.Place.City;
-                    station.CountryCode = deviceDto.Place.Country;
-                    station.Latitude = deviceDto.Place.Location[0];
-                    station.Longitude = deviceDto.Place.Location[1];
-                    station.Timezone = deviceDto.Place.Timezone;
-
-                    var mainModule = station.Devices.OfType<MainDevice>().SingleOrDefault(d => d.Id == deviceDto.Id);
-                    if (mainModule == null)
-                    {
-                        mainModule = new MainDevice
-                        {
-                            Id = deviceDto.Id,
-                            DashboardData = new List<DashboardData>()
-                        };
-                        station.Devices.Add(mainModule);
-                    }
-
-                    mainModule.Name = deviceDto.ModuleName;
-                    mainModule.Firmware = deviceDto.FirmwareVersion;
-                    mainModule.WifiStatus = deviceDto.WifiStatus;
-                    mainModule.DashboardData.Add(Convert2MainDashboardData(deviceDto.DashboardData));
-
-                    foreach (var moduleDto in deviceDto.Modules)
-                    {
-                        var module = station.Devices.OfType<ModuleDevice>().SingleOrDefault(d => d.Id == moduleDto.Id);
-                        if (module == null)
-                        {
-                            module = new ModuleDevice
-                            {
-                                Id = moduleDto.Id,
-                                Type = ConvertToModuleType(moduleDto.Type),
-                                DashboardData = new List<DashboardData>()
-                            };
-                            station.Devices.Add(module);
-                        }
-
-                        module.Name = moduleDto.ModuleName;
-                        module.Firmware = moduleDto.FirmwareVersion;
-                        module.RfStatus = moduleDto.RFStatus;
-                        module.BatteryVp = moduleDto.BatteryPower;
-                        module.BatteryPercent = moduleDto.BatteryPercentage;
-                        module.DashboardData.Add(Convert2ModuleDashboardData(moduleDto));
-                    }
+                    station = new Station { Devices = new List<Models.Device>() };
+                    user.Stations.Add(station);
                 }
 
-                await db.SaveChangesAsync();
+                station.Name = deviceDto.StationName;
+                station.Altitude = deviceDto.Place.Altitude;
+                station.City = deviceDto.Place.City;
+                station.CountryCode = deviceDto.Place.Country;
+                station.Latitude = deviceDto.Place.Location[0];
+                station.Longitude = deviceDto.Place.Location[1];
+                station.Timezone = deviceDto.Place.Timezone;
+
+                var mainModule = station.Devices.OfType<MainDevice>().SingleOrDefault(d => d.Id == deviceDto.Id);
+                if (mainModule == null)
+                {
+                    mainModule = new MainDevice
+                    {
+                        Id = deviceDto.Id,
+                        DashboardData = new List<DashboardData>()
+                    };
+                    station.Devices.Add(mainModule);
+                }
+
+                mainModule.Name = deviceDto.ModuleName;
+                mainModule.Firmware = deviceDto.FirmwareVersion;
+                mainModule.WifiStatus = deviceDto.WifiStatus;
+                mainModule.DashboardData.Add(Convert2MainDashboardData(deviceDto.DashboardData));
+
+                foreach (var moduleDto in deviceDto.Modules)
+                {
+                    var module = station.Devices.OfType<ModuleDevice>().SingleOrDefault(d => d.Id == moduleDto.Id);
+                    if (module == null)
+                    {
+                        module = new ModuleDevice
+                        {
+                            Id = moduleDto.Id,
+                            Type = ConvertToModuleType(moduleDto.Type),
+                            DashboardData = new List<DashboardData>()
+                        };
+                        station.Devices.Add(module);
+                    }
+
+                    module.Name = moduleDto.ModuleName;
+                    module.Firmware = moduleDto.FirmwareVersion;
+                    module.RfStatus = moduleDto.RFStatus;
+                    module.BatteryVp = moduleDto.BatteryPower;
+                    module.BatteryPercent = moduleDto.BatteryPercentage;
+                    module.DashboardData.Add(Convert2ModuleDashboardData(moduleDto));
+                }
             }
+
+            await db.SaveChangesAsync();
         }
 
         private async Task<string> EnsureValidAccessToken(DbUser user)

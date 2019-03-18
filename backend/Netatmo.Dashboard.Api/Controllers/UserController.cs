@@ -38,7 +38,6 @@ namespace Netatmo.Dashboard.Api.Controllers
                 user = new Models.User
                 {
                     Uid = uid,
-                    Enabled = true,
                 };
                 await db.Users.AddAsync(user);
                 await db.SaveChangesAsync();
