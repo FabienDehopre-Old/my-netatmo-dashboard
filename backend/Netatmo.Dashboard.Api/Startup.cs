@@ -59,6 +59,7 @@ namespace Netatmo.Dashboard.Api
             //});
 
             services.Configure<NetatmoOptions>(Configuration.GetSection("Netatmo"));
+            services.Configure<Auth0Options>(Configuration.GetSection("Auth0"));
 
             services.AddScoped<HttpClient>();
             services.AddScoped<NetatmoDbContext>();

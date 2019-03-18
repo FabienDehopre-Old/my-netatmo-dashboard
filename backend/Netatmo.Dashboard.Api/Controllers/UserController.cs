@@ -2,6 +2,8 @@
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Auth0.ManagementApi;
+using Auth0.ManagementApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,14 +48,32 @@ namespace Netatmo.Dashboard.Api.Controllers
         }
 
         [HttpPost("verification-email")]
-        public async Task ResendVerificationEmail()
+        public async Task<string> ResendVerificationEmail()
         {
             var uid = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var body = new { client_id = "", user_id = uid };
-            // TODO: Get acces token for Auth0 Management API v2
-            using (var response = await httpClient.PostAsJsonAsync($"https://{options.Domain}/api/v2/jobs/verification-email", body))
+            var token = await GetManagementApiAccessToken();
+            var client = new ManagementApiClient(token, options.Domain);
+            var job = await client.Jobs.SendVerificationEmailAsync(new VerifyEmailJobRequest
+            {
+                UserId = uid
+            });
+            return job.Id;
+        }
+
+        private async Task<string> GetManagementApiAccessToken()
+        {
+            var body = new
+            {
+                client_id = options.ClientId,
+                client_secret = options.ClientSecret,
+                audience = $"https://{options.Domain}/api/v2/",
+                grant_type = "client_credentials"
+            };
+            using (var response = await httpClient.PostAsJsonAsync($"", body))
             {
                 response.EnsureSuccessStatusCode();
+                var data = await response.Content.ReadAsAsync<(string access_token, string token_type)>();
+                return data.access_token;
             }
         }
     }
