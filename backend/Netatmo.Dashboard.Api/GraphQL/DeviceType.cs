@@ -1,9 +1,71 @@
 ﻿using GraphQL.Types;
+using Netatmo.Dashboard.Api.Helpers;
 using Netatmo.Dashboard.Api.Models;
 
 namespace Netatmo.Dashboard.Api.GraphQL
 {
-    public class DeviceType : ObjectGraphType<Device>
+    public class DeviceInterface : InterfaceGraphType<Device>
     {
+        public DeviceInterface()
+        {
+            Name = "Device";
+
+            Field(x => x.Id);
+            Field(x => x.Name);
+            Field(x => x.Firmware);
+            Field<StationType>("station");
+            Field<ListGraphType<DashboardDataInterface>>("dashboardData");
+        }
+    }
+
+    public class MainDeviceType : ObjectGraphType<MainDevice>
+    {
+        public MainDeviceType(ContextServiceLocator contextServiceLocator)
+        {
+            Name = "MainDevice";
+
+            Field(x => x.Id);
+            Field(x => x.Name);
+            Field(x => x.Firmware);
+            Field<StationType>(
+                "station",
+                resolve: context => contextServiceLocator.StationRepository.GetOne(context.Source.StationId),
+                description: "Station that manage this device."
+            );
+            Field<ListGraphType<DashboardDataInterface>>(
+                "dashboardData",
+                resolve: context => contextServiceLocator.DashboardDataRepository.GetAll(context.Source.Id)
+            );
+            Field(x => x.WifiStatus);
+
+            Interface<DeviceInterface>();
+        }
+    }
+
+    public class ModuleDeviceType : ObjectGraphType<ModuleDevice>
+    {
+        public ModuleDeviceType(ContextServiceLocator contextServiceLocator)
+        {
+            Name = "ModuleDevice";
+
+            Field(x => x.Id);
+            Field(x => x.Name);
+            Field(x => x.Firmware);
+            Field<StationType>(
+                "station",
+                resolve: context => contextServiceLocator.StationRepository.GetOne(context.Source.StationId),
+                description: "Station that manage this device."
+            );
+            Field<ListGraphType<DashboardDataInterface>>(
+                "dashboardData",
+                resolve: context => contextServiceLocator.DashboardDataRepository.GetAll(context.Source.Id)
+            );
+            Field(x => x.RfStatus);
+            Field(x => x.BatteryVp);
+            Field(x => x.BatteryPercent);
+            Field<ModuleDeviceTypeEnum>("type");
+
+            Interface<DeviceInterface>();
+        }
     }
 }

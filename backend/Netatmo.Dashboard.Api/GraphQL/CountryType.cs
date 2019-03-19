@@ -8,6 +8,9 @@ namespace Netatmo.Dashboard.Api.GraphQL
     {
         public CountryType(ContextServiceLocator contextServiceLocator)
         {
+            Name = "Country";
+            // Description = "";
+
             Field(x => x.Code).Type(new IdGraphType());
             Field(x => x.Flag);
             Field(x => x.NameEN);
