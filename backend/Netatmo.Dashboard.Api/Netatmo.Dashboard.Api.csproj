@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="Auth0.ManagementApi" Version="5.11.0" />
-    <PackageReference Include="GraphiQL" Version="1.2.0" />
     <PackageReference Include="GraphQL" Version="2.4.0" />
     <PackageReference Include="Hangfire.AspNetCore" Version="1.6.23" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.6.23" />

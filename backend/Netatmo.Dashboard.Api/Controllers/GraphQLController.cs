@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Types;
@@ -11,7 +10,7 @@ using Netatmo.Dashboard.Api.Schema;
 
 namespace Netatmo.Dashboard.Api.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [Route("[controller]")]
     public class GraphQLController : Controller
     {

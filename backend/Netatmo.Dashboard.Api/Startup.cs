@@ -1,5 +1,4 @@
-﻿using GraphiQl;
-using GraphQL;
+﻿using GraphQL;
 using GraphQL.Types;
 using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -101,8 +100,6 @@ namespace Netatmo.Dashboard.Api
             GlobalConfiguration.Configuration.UseActivator(new HangfireActivator(serviceProvider));
             app.UseHangfireDashboard();
             app.UseHangfireServer();
-
-            app.UseGraphiQl();
 
             app.UseCors();
             app.UseAuthentication();
