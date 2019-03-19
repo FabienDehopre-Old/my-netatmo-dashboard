@@ -9,11 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Netatmo.Dashboard.Api.GraphQL;
 using Netatmo.Dashboard.Api.Hangfire;
 using Netatmo.Dashboard.Api.Helpers;
 using Netatmo.Dashboard.Api.Options;
 using Netatmo.Dashboard.Api.Repositories;
-using Netatmo.Dashboard.Api.Schema;
 using System;
 using System.Net.Http;
 
@@ -67,14 +67,16 @@ namespace Netatmo.Dashboard.Api
             services.Configure<NetatmoOptions>(Configuration.GetSection("Netatmo"));
             services.Configure<Auth0Options>(Configuration.GetSection("Auth0"));
 
-            services.AddScoped<HttpClient>();
-            services.AddScoped<NetatmoDbContext>();
-            services.AddScoped<NetatmoTasks>();
+            services.AddSingleton<HttpClient>();
+            services.AddSingleton<NetatmoDbContext>();
+            services.AddSingleton<NetatmoTasks>();
             services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
             services.AddSingleton<ContextServiceLocator>();
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddTransient<IStationRepository, StationRepository>();
             services.AddTransient<ICountryRepository, CountryRepository>();
+            services.AddTransient<IDeviceRepository, DeviceRepository>();
+            services.AddTransient<IDashboardDataRepository, DashboardDataRepository>();
             services.AddSingleton<NetatmoQuery>();
             services.AddSingleton<StationType>();
             services.AddSingleton<CountryType>();

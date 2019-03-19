@@ -1,8 +1,9 @@
 ﻿using GraphQL;
+using GraphQL.Types;
 
-namespace Netatmo.Dashboard.Api.Schema
+namespace Netatmo.Dashboard.Api.GraphQL
 {
-    public class NetatmoSchema : GraphQL.Types.Schema
+    public class NetatmoSchema : Schema
     {
         public NetatmoSchema(IDependencyResolver resolver)
             : base(resolver)

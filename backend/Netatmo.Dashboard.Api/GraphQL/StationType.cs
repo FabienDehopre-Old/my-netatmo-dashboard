@@ -2,7 +2,7 @@
 using Netatmo.Dashboard.Api.Helpers;
 using Netatmo.Dashboard.Api.Models;
 
-namespace Netatmo.Dashboard.Api.Schema
+namespace Netatmo.Dashboard.Api.GraphQL
 {
     public class StationType : ObjectGraphType<Station>
     {

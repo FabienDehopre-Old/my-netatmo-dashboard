@@ -1,7 +1,7 @@
 ﻿using GraphQL.Types;
 using Netatmo.Dashboard.Api.Helpers;
 
-namespace Netatmo.Dashboard.Api.Schema
+namespace Netatmo.Dashboard.Api.GraphQL
 {
     public class NetatmoQuery : ObjectGraphType
     {
