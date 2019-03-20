@@ -2,7 +2,9 @@
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Types;
+#if !DEBUG
 using Microsoft.AspNetCore.Authorization;
+#endif
 using Microsoft.AspNetCore.Mvc;
 using Netatmo.Dashboard.Api.GraphQL;
 
@@ -10,7 +12,9 @@ using Netatmo.Dashboard.Api.GraphQL;
 
 namespace Netatmo.Dashboard.Api.Controllers
 {
+#if !DEBUG
     [Authorize]
+#endif
     [Route("[controller]")]
     public class GraphQLController : Controller
     {

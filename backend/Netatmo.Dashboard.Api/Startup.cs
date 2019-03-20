@@ -1,4 +1,5 @@
-﻿using GraphQL;
+﻿using GraphiQl;
+using GraphQL;
 using GraphQL.Types;
 using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -98,8 +99,18 @@ namespace Netatmo.Dashboard.Api
                 app.UseHsts();
             }
 
+#if DEBUG
+            app.UseGraphiQl();
+#endif
+
             GlobalConfiguration.Configuration.UseActivator(new HangfireActivator(serviceProvider));
-            app.UseHangfireDashboard();
+            app.UseHangfireDashboard(options: new DashboardOptions
+            {
+#if !DEBUG
+                Authorization = new[] { new AuthorizationFilter($"https://{Configuration["Auth0:Domain"]}/") },
+#endif
+                AppPath = env.IsDevelopment() ? "https://localhost:4200" : "TODO"
+            });
             app.UseHangfireServer();
 
             app.UseCors();
