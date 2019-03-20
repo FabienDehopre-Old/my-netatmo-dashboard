@@ -68,8 +68,7 @@ namespace Netatmo.Dashboard.Api
             services.Configure<Auth0Options>(Configuration.GetSection("Auth0"));
 
             services.AddSingleton<HttpClient>();
-            services.AddSingleton<NetatmoDbContext>();
-            services.AddSingleton<NetatmoTasks>();
+            services.AddTransient<NetatmoTasks>();
             services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
             services.AddSingleton<ContextServiceLocator>();
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
