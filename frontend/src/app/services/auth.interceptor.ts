@@ -2,7 +2,9 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/c
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { ACCESS_TOKEN, AuthService } from './auth.service';
+import { ACCESS_TOKEN } from '../models/consts';
+
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {

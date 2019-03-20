@@ -112,7 +112,7 @@ export class AuthService {
   resendVerificationEmail(): Observable<void> {
     return this.configService.config$
       .pipe(
-        switchMap(config => this.http.post(`${config.apiBaseUrl}/user/verification-email`, {})),
+        switchMap(config => this.http.post(`${config.apiBaseUrl}/api/user/verification-email`, {})),
         map(() => void(0))
       );
   }

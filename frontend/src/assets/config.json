@@ -1,6 +1,6 @@
 {
   "logLevel": "DEBUG",
-  "apiBaseUrl": "https://localhost:44388/api",
+  "apiBaseUrl": "https://localhost:44388",
   "auth0": {
     "domain": "dehopre.eu.auth0.com",
     "clientId": "cfH0Ie4vm8TQ1wySzRc4qKgFCbBvltKk"
