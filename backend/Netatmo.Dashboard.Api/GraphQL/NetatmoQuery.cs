@@ -9,24 +9,24 @@ namespace Netatmo.Dashboard.Api.GraphQL
         {
             Field<ListGraphType<StationType>>(
                 "stations",
-                resolve: context => contextServiceLocator.StationRepository.GetAll()
+                resolve: ctx => contextServiceLocator.StationRepository.GetAll()
             );
 
             Field<StationType>(
                 "station",
                 arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "id" }),
-                resolve: context => contextServiceLocator.StationRepository.GetOne(context.GetArgument<int>("id"))
+                resolve: ctx => contextServiceLocator.StationRepository.GetOne(ctx.GetArgument<int>("id"))
             );
 
             Field<ListGraphType<CountryType>>(
                 "countries",
-                resolve: context => contextServiceLocator.CountryRepository.GetAll()
+                resolve: ctx => contextServiceLocator.CountryRepository.GetAll()
             );
 
             Field<CountryType>(
                 "country",
                 arguments: new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "code" }),
-                resolve: context => contextServiceLocator.CountryRepository.GetOne(context.GetArgument<string>("code"))
+                resolve: ctx => contextServiceLocator.CountryRepository.GetOne(ctx.GetArgument<string>("code"))
             );
         }
     }

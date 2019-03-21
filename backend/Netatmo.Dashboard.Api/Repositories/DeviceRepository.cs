@@ -22,5 +22,10 @@ namespace Netatmo.Dashboard.Api.Repositories
         {
             return await db.Devices.Where(d => d.StationId == stationId).ToArrayAsync();
         }
+
+        public async Task<Device> GetOne(string deviceId)
+        {
+            return await db.Devices.SingleOrDefaultAsync(d => d.Id == deviceId);
+        }
     }
 }

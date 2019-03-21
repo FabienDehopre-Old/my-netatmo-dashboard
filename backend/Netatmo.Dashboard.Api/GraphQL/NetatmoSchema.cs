@@ -9,6 +9,13 @@ namespace Netatmo.Dashboard.Api.GraphQL
             : base(resolver)
         {
             Query = resolver.Resolve<NetatmoQuery>();
+            RegisterType<MainDeviceType>();
+            RegisterType<ModuleDeviceType>();
+            RegisterType<MainDashboardDataType>();
+            RegisterType<OutdoorDashboardDataType>();
+            RegisterType<WindGaugeDashboardDataType>();
+            RegisterType<RainGaugeDashboardDataType>();
+            RegisterType<IndoorDashboardDataType>();
         }
     }
 }

@@ -6,5 +6,6 @@ namespace Netatmo.Dashboard.Api.Repositories
     public interface IDeviceRepository
     {
         Task<Device[]> GetAll(int stationId);
+        Task<Device> GetOne(string deviceId);
     }
 }

@@ -80,6 +80,17 @@ namespace Netatmo.Dashboard.Api
             services.AddSingleton<NetatmoQuery>();
             services.AddSingleton<StationType>();
             services.AddSingleton<CountryType>();
+            services.AddSingleton<DeviceInterface>();
+            services.AddSingleton<MainDeviceType>();
+            services.AddSingleton<ModuleDeviceType>();
+            services.AddSingleton<DashboardDataInterface>();
+            services.AddSingleton<MainDashboardDataType>();
+            services.AddSingleton<OutdoorDashboardDataType>();
+            services.AddSingleton<WindGaugeDashboardDataType>();
+            services.AddSingleton<RainGaugeDashboardDataType>();
+            services.AddSingleton<IndoorDashboardDataType>();
+            services.AddSingleton<ModuleDeviceTypeEnum>();
+            services.AddSingleton<TrendEnum>();
             var sp = services.BuildServiceProvider();
             services.AddSingleton<ISchema>(new NetatmoSchema(new FuncDependencyResolver(type => sp.GetService(type))));
         }

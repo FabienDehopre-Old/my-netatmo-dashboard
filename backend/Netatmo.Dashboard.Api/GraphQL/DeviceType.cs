@@ -29,16 +29,17 @@ namespace Netatmo.Dashboard.Api.GraphQL
             Field(x => x.Firmware);
             Field<StationType>(
                 "station",
-                resolve: context => contextServiceLocator.StationRepository.GetOne(context.Source.StationId),
+                resolve: ctx => contextServiceLocator.StationRepository.GetOne(ctx.Source.StationId),
                 description: "Station that manage this device."
             );
             Field<ListGraphType<DashboardDataInterface>>(
                 "dashboardData",
-                resolve: context => contextServiceLocator.DashboardDataRepository.GetAll(context.Source.Id)
+                resolve: ctx => contextServiceLocator.DashboardDataRepository.GetAll(ctx.Source.Id)
             );
             Field(x => x.WifiStatus);
 
             Interface<DeviceInterface>();
+            IsTypeOf = obj => obj is MainDevice;
         }
     }
 
@@ -53,19 +54,20 @@ namespace Netatmo.Dashboard.Api.GraphQL
             Field(x => x.Firmware);
             Field<StationType>(
                 "station",
-                resolve: context => contextServiceLocator.StationRepository.GetOne(context.Source.StationId),
+                resolve: ctx => contextServiceLocator.StationRepository.GetOne(ctx.Source.StationId),
                 description: "Station that manage this device."
             );
             Field<ListGraphType<DashboardDataInterface>>(
                 "dashboardData",
-                resolve: context => contextServiceLocator.DashboardDataRepository.GetAll(context.Source.Id)
+                resolve: ctx => contextServiceLocator.DashboardDataRepository.GetAll(ctx.Source.Id)
             );
             Field(x => x.RfStatus);
             Field(x => x.BatteryVp);
             Field(x => x.BatteryPercent);
-            Field<ModuleDeviceTypeEnum>("type");
+            Field<ModuleDeviceTypeEnum>("type", resolve: ctx => ctx.Source.Type);
 
             Interface<DeviceInterface>();
+            IsTypeOf = obj => obj is ModuleDevice;
         }
     }
 }

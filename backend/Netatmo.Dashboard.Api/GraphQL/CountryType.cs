@@ -27,7 +27,7 @@ namespace Netatmo.Dashboard.Api.GraphQL
             Field<ListGraphType<StationType>>(
                 "stations",
                 arguments: new QueryArguments(new QueryArgument<IdGraphType> { Name = "id" }),
-                resolve: context => contextServiceLocator.StationRepository.GetAll(context.Source.Code)
+                resolve: ctx => contextServiceLocator.StationRepository.GetAll(ctx.Source.Code)
             );
         }
     }

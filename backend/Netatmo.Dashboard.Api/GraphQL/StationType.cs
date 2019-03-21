@@ -17,7 +17,7 @@ namespace Netatmo.Dashboard.Api.GraphQL
             Field(x => x.City);
             Field<CountryType>(
                 "country",
-                resolve: context => contextServiceLocator.CountryRepository.GetOne(context.Source.CountryCode),
+                resolve: ctx => contextServiceLocator.CountryRepository.GetOne(ctx.Source.CountryCode),
                 description: "Country in which the wheather station is located."
             );
             Field(x => x.Latitude);
@@ -27,7 +27,7 @@ namespace Netatmo.Dashboard.Api.GraphQL
             Field<ListGraphType<DeviceInterface>>(
                 "devices",
                 arguments: new QueryArguments(new QueryArgument<IdGraphType> { Name = "id" }),
-                resolve: context => contextServiceLocator.DeviceRepository.GetAll(context.Source.Id)
+                resolve: ctx => contextServiceLocator.DeviceRepository.GetAll(ctx.Source.Id)
             );
         }
     }
