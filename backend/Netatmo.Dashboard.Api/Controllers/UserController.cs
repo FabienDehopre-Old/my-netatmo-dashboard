@@ -30,8 +30,29 @@ namespace Netatmo.Dashboard.Api.Controllers
             this.options = (options ?? throw new ArgumentNullException(nameof(options))).CurrentValue;
         }
 
-        [HttpGet("ensure")]
-        public async Task<bool> EnsureUserCreated()
+        [HttpGet]
+        public async Task<ActionResult> GetProfile()
+        {
+            var uid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await db.Users.SingleOrDefaultAsync(u => u.Uid == uid);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // TODO: Create a DTO?
+            return Ok(new
+            {
+                user.FeelLike,
+                user.PressureUnit,
+                user.Unit,
+                user.WindUnit
+                // TODO: add more data to user profile
+            });
+        }
+
+        [HttpPost("ensure")]
+        public async Task<ActionResult<bool>> EnsureCreated()
         {
             var uid = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await db.Users.SingleOrDefaultAsync(u => u.Uid == uid);
@@ -43,13 +64,14 @@ namespace Netatmo.Dashboard.Api.Controllers
                 };
                 await db.Users.AddAsync(user);
                 await db.SaveChangesAsync();
+                return CreatedAtAction("GetUserProfile", false);
             }
 
-            return user != null && !string.IsNullOrWhiteSpace(user.AccessToken) && !string.IsNullOrWhiteSpace(user.RefreshToken) && user.ExpiresAt.HasValue;
+            return !string.IsNullOrWhiteSpace(user.AccessToken) && !string.IsNullOrWhiteSpace(user.RefreshToken) && user.ExpiresAt.HasValue;
         }
 
         [HttpPost("verification-email")]
-        public async Task<string> ResendVerificationEmail()
+        public async Task<ActionResult<string>> ResendVerificationEmail()
         {
             var uid = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var token = await GetManagementApiAccessToken();
