@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import * as Sentry from '@sentry/browser';
@@ -21,8 +20,7 @@ export class AuthService {
   constructor(
     private readonly configService: ConfigService,
     private readonly logger: LoggerService,
-    private readonly router: Router,
-    private readonly http: HttpClient
+    private readonly router: Router
   ) {
     this.webAuth$ = this.configService.config$.pipe(
       map(
@@ -107,14 +105,6 @@ export class AuthService {
   isAuthenticated(): boolean {
     const expiresAt = JSON.parse(localStorage.getItem(EXPIRES_AT) || '0');
     return expiresAt > Date.now();
-  }
-
-  resendVerificationEmail(): Observable<void> {
-    return this.configService.config$
-      .pipe(
-        switchMap(config => this.http.post(`${config.apiBaseUrl}/api/user/verification-email`, {})),
-        map(() => void(0))
-      );
   }
 
   private scheduleRenewal(): void {
