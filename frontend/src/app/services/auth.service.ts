@@ -17,11 +17,7 @@ export class AuthService {
   private readonly webAuth$: Observable<auth0.WebAuth>;
   private refreshSubscription?: Subscription;
 
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly logger: LoggerService,
-    private readonly router: Router
-  ) {
+  constructor(private readonly configService: ConfigService, private readonly logger: LoggerService, private readonly router: Router) {
     this.webAuth$ = this.configService.config$.pipe(
       map(
         config =>

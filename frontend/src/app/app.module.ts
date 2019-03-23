@@ -8,12 +8,14 @@ import { VERSION } from '../version';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { AuthorizeDialogComponent } from './components/authorize-dialog/authorize-dialog.component';
 import { LayoutComponent } from './components/layout/layout.component';
+import { NetatmoCallbackErrorDialogComponent } from './components/netatmo-callback-error-dialog/netatmo-callback-error-dialog.component';
 import { MaterialModule } from './material.module';
 import { CallbackComponent } from './pages/callback/callback.component';
-import { EmailVerifiedComponent } from './pages/email-verified/email-verified.component';
 import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
+import { NetatmoCallbackComponent } from './pages/netatmo-callback/netatmo-callback.component';
 import { SignupSuccessComponent } from './pages/signup-success/signup-success.component';
 import { AltitudePipe } from './pipes/altitude.pipe';
 import { AuthInterceptor } from './services/auth.interceptor';
@@ -40,7 +42,9 @@ export function initApp(configService: ConfigService): () => void {
     LayoutComponent,
     AltitudePipe,
     SignupSuccessComponent,
-    EmailVerifiedComponent,
+    AuthorizeDialogComponent,
+    NetatmoCallbackComponent,
+    NetatmoCallbackErrorDialogComponent,
   ],
   imports: [BrowserAnimationsModule, AppRoutingModule, HttpClientModule, MaterialModule],
   providers: [
