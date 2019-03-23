@@ -6,6 +6,7 @@ using Netatmo.Dashboard.Api.DTOs;
 using Netatmo.Dashboard.Api.Options;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -61,7 +62,7 @@ namespace Netatmo.Dashboard.Api.Controllers
             using (var response = await httpClient.PostAsync("https://api.netatmo.com/oauth2/token", new FormUrlEncodedContent(data)))
             {
                 response.EnsureSuccessStatusCode();
-                var authorization = await response.Content.ReadAsAsync<Authorization>();
+                var authorization = await response.Content.ReadAsAsync<DTOs.Authorization>();
                 user.AccessToken = authorization.AccessToken;
                 user.RefreshToken = authorization.RefreshToken;
                 user.ExpiresAt = DateTime.Now.AddSeconds(authorization.ExpiresIn);
