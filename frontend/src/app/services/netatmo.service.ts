@@ -8,7 +8,7 @@ import { NETATMO_RETURN_URL, NETATMO_STATE } from '../models/consts';
 import { ConfigService } from './config.service';
 
 export function isAuthorizeUrl(value: any): value is { url: string; state: string } {
-  return value != undefined && 'url' in value && 'state' in value;
+  return value != undefined && typeof value === 'object' && 'url' in value && 'state' in value;
 }
 
 @Injectable({ providedIn: 'root' })

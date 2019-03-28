@@ -5,7 +5,7 @@ import * as auth0 from 'auth0-js';
 import { Observable, of, Subscription, throwError, timer } from 'rxjs';
 import { first, map, switchMap, withLatestFrom } from 'rxjs/operators';
 
-import { ACCESS_TOKEN, EXPIRES_AT, ID_TOKEN, RETURN_URL } from '../models/consts';
+import { ACCESS_TOKEN, EXPIRES_AT, ID_TOKEN, POST_LOGOUT_URL, RETURN_URL } from '../models/consts';
 
 import { ConfigService } from './config.service';
 import { LoggerService } from './logger.service';
@@ -58,7 +58,7 @@ export class AuthService {
     );
   }
 
-  logout(returnTo: string): void {
+  logout(returnTo: string = POST_LOGOUT_URL): void {
     this.unscheduleRenewal();
     localStorage.removeItem(ACCESS_TOKEN);
     localStorage.removeItem(ID_TOKEN);

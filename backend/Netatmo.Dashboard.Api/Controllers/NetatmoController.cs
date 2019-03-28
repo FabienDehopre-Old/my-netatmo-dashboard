@@ -34,10 +34,10 @@ namespace Netatmo.Dashboard.Api.Controllers
         }
 
         [HttpGet]
-        public ActionResult<(string Url, string State)> BuildAuthorizeUrl(string returnUrl)
+        public ActionResult<AuthorizeUrl> BuildAuthorizeUrl(string returnUrl)
         {
             var state = GenerateRandomString(32);
-            return ($"https://api.netatmo.com/oauth2/authorize?client_id={options.ClientId}&redirect_uri={WebUtility.UrlEncode(returnUrl)}&scope=read_station&state={state}", state);
+            return new AuthorizeUrl { Url = $"https://api.netatmo.com/oauth2/authorize?client_id={options.ClientId}&redirect_uri={WebUtility.UrlEncode(returnUrl)}&scope=read_station&state={state}", State = state };
         }
 
         [HttpPost("exchange-code")]

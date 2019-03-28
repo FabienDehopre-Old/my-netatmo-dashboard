@@ -46,6 +46,7 @@ export function initApp(configService: ConfigService): () => void {
     NetatmoCallbackComponent,
     NetatmoCallbackErrorDialogComponent,
   ],
+  entryComponents: [AuthorizeDialogComponent, NetatmoCallbackErrorDialogComponent],
   imports: [BrowserAnimationsModule, AppRoutingModule, HttpClientModule, MaterialModule],
   providers: [
     { provide: ErrorHandler, useClass: SentryErrorHandler },

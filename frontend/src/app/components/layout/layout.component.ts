@@ -18,6 +18,6 @@ export class LayoutComponent implements OnInit {
   }
 
   logout(): void {
-    this.authService.logout(`${window.location.origin}/`);
+    this.authService.logout();
   }
 }

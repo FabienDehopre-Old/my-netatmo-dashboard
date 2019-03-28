@@ -65,7 +65,7 @@ export class NetatmoCallbackComponent implements OnInit, OnDestroy {
         if (result) {
           this.router.navigate(['/']);
         } else {
-          this.authService.logout('/');
+          this.authService.logout();
         }
       });
   }

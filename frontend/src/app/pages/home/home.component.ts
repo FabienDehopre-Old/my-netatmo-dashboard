@@ -52,7 +52,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       )
       .subscribe(result => {
         if (result === false) {
-          this.authService.logout('/');
+          this.authService.logout();
         }
       });
   }
