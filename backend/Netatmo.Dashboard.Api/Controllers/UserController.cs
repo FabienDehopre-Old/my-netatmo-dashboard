@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Netatmo.Dashboard.Api.DTOs;
 using Netatmo.Dashboard.Api.Hangfire;
 using Netatmo.Dashboard.Api.Options;
 
@@ -46,7 +47,8 @@ namespace Netatmo.Dashboard.Api.Controllers
                 user.FeelLike,
                 user.PressureUnit,
                 user.Unit,
-                user.WindUnit
+                user.WindUnit,
+                Enabled = !string.IsNullOrWhiteSpace(user.AccessToken)
                 // TODO: add more data to user profile
             });
         }
@@ -76,9 +78,10 @@ namespace Netatmo.Dashboard.Api.Controllers
             var uid = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var token = await GetManagementApiAccessToken();
             var client = new ManagementApiClient(token, options.Domain);
-            var job = await client.Jobs.SendVerificationEmailAsync(new VerifyEmailJobRequest
+            var job = await client.Jobs.SendVerificationEmailAsync(new VerifyEmailJobRequestWithClientId
             {
-                UserId = uid
+                UserId = uid,
+                ClientId = options.ClientId
             });
             return job.Id;
         }
@@ -129,8 +132,8 @@ namespace Netatmo.Dashboard.Api.Controllers
             using (var response = await httpClient.PostAsJsonAsync($"https://{options.Domain}/oauth/token", body))
             {
                 response.EnsureSuccessStatusCode();
-                var data = await response.Content.ReadAsAsync<(string access_token, string token_type)>();
-                return data.access_token;
+                var data = await response.Content.ReadAsAsync<ManagementApiToken>();
+                return data.AccessToken;
             }
         }
     }
