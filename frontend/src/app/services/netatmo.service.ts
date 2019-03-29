@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, timer } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 
 import { NETATMO_RETURN_URL, NETATMO_STATE } from '../models/consts';
@@ -28,9 +28,9 @@ export class NetatmoService {
     const sessionStorageState = sessionStorage.getItem(NETATMO_STATE);
     sessionStorage.removeItem(NETATMO_STATE);
     if (error != undefined) {
-      return throwError(new Error(error));
+      return this.throwError(error);
     } else if (state !== sessionStorageState) {
-      return throwError(new Error('invalid_state'));
+      return this.throwError('invalid_state');
     }
 
     return this.configService.config$.pipe(
@@ -39,5 +39,10 @@ export class NetatmoService {
         this.httpClient.post<void>(`${apiBaseUrl}/api/netatmo/exchange-code`, { code, returnUrl: NETATMO_RETURN_URL })
       )
     );
+  }
+
+  // simulate an HTTP call by emitting the error on next frame
+  private throwError(message: string): Observable<void> {
+    return timer(1).pipe(switchMap(() => throwError(new Error(message))));
   }
 }

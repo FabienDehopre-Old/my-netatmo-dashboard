@@ -8,14 +8,10 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NetatmoCallbackErrorDialogComponent {
-  readonly body: string;
-
   constructor(
     private readonly dialogRef: MatDialogRef<NetatmoCallbackErrorDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) readonly data: { message: string; error: any }
-  ) {
-    this.body = encodeURIComponent(`The error message is: ${this.data.message}.\nThe error is: ${JSON.stringify(data.error)}`);
-  }
+    @Inject(MAT_DIALOG_DATA) readonly data: { eventId: string }
+  ) {}
 
   close(): void {
     this.dialogRef.close(false);

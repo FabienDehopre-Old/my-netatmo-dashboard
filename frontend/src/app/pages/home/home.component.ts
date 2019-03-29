@@ -1,7 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { of } from 'rxjs';
-import { filter, switchMap, tap } from 'rxjs/operators';
+import { iif, of } from 'rxjs';
+import { filter } from 'rxjs/internal/operators/filter';
+import { switchMap } from 'rxjs/internal/operators/switchMap';
+import { tap } from 'rxjs/internal/operators/tap';
+import { mergeMap } from 'rxjs/operators';
 
 import { AuthorizeDialogComponent } from '../../components/authorize-dialog/authorize-dialog.component';
 import { NETATMO_STATE } from '../../models/consts';
@@ -27,13 +30,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.userService
       .ensureCreated()
       .pipe(
-        switchMap(result => {
-          if (result) {
-            return of(result);
-          } else {
-            return this.netatmoService.buildAuthorizeUrl();
-          }
-        }),
+        mergeMap(result =>
+          iif(
+            () => result,
+            of(result),
+            this.netatmoService.buildAuthorizeUrl()
+          )
+        ),
         filter(isAuthorizeUrl),
         tap(authorizeUrl => sessionStorage.setItem(NETATMO_STATE, authorizeUrl.state)),
         switchMap(authorizeUrl =>
@@ -51,7 +54,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         untilComponentDestroyed(this)
       )
       .subscribe(result => {
-        if (result === false) {
+        if (!result) {
           this.authService.logout();
         }
       });

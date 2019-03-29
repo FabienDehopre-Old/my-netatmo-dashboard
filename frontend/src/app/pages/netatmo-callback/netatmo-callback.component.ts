@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as Sentry from '@sentry/browser';
@@ -31,26 +31,17 @@ export class NetatmoCallbackComponent implements OnInit, OnDestroy {
         map(paramMap => [paramMap.get('state'), paramMap.get('code'), paramMap.get('error')]),
         switchMap(([state, code, error]) => this.netatmoService.exchangeCodeForAccessToken(state, code, error)),
         map(() => true),
-        catchError(error => {
-          this.loggerService.error('An error occurred while authorizing netatmo access', error);
-          let message: string;
-          if (typeof error === 'string') {
-            message = error;
-            Sentry.captureMessage(message, Sentry.Severity.Error);
-          } else if (error instanceof Error) {
-            message = error.message;
-            Sentry.captureException(error);
-          } else {
-            message = 'unknown_error';
-            Sentry.captureMessage(message, Sentry.Severity.Error);
-          }
-
+        catchError((error: Error) => {
+          this.loggerService.error('An error occurred while authorizing netatmo access', error.message);
+          const eventId = Sentry.captureMessage(
+            `An error occurred while authorizing netatmo access: ${error.message}`,
+            Sentry.Severity.Error
+          );
           return this.matDialog
             .open(NetatmoCallbackErrorDialogComponent, {
               closeOnNavigation: true,
               data: {
-                message,
-                error,
+                eventId
               },
               disableClose: true,
               hasBackdrop: true,
@@ -62,7 +53,7 @@ export class NetatmoCallbackComponent implements OnInit, OnDestroy {
         untilComponentDestroyed(this)
       )
       .subscribe(result => {
-        if (result) {
+        if (result === true) {
           this.router.navigate(['/']);
         } else {
           this.authService.logout();
