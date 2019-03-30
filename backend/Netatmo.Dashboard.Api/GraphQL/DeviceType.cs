@@ -4,17 +4,12 @@ using Netatmo.Dashboard.Api.Models;
 
 namespace Netatmo.Dashboard.Api.GraphQL
 {
-    public class DeviceInterface : InterfaceGraphType<Device>
+    public class DeviceUnion : UnionGraphType
     {
-        public DeviceInterface()
+        public DeviceUnion()
         {
-            Name = "Device";
-
-            Field(x => x.Id);
-            Field(x => x.Name);
-            Field(x => x.Firmware);
-            Field<StationType>("station");
-            Field<ListGraphType<DashboardDataInterface>>("dashboardData");
+            Type<MainDeviceType>();
+            Type<ModuleDeviceType>();
         }
     }
 
@@ -32,14 +27,11 @@ namespace Netatmo.Dashboard.Api.GraphQL
                 resolve: ctx => contextServiceLocator.StationRepository.GetOne(ctx.Source.StationId),
                 description: "Station that manage this device."
             );
-            Field<ListGraphType<DashboardDataInterface>>(
+            Field<ListGraphType<MainDashboardDataType>>(
                 "dashboardData",
                 resolve: ctx => contextServiceLocator.DashboardDataRepository.GetAll(ctx.Source.Id)
             );
             Field(x => x.WifiStatus);
-
-            Interface<DeviceInterface>();
-            IsTypeOf = obj => obj is MainDevice;
         }
     }
 
@@ -57,7 +49,7 @@ namespace Netatmo.Dashboard.Api.GraphQL
                 resolve: ctx => contextServiceLocator.StationRepository.GetOne(ctx.Source.StationId),
                 description: "Station that manage this device."
             );
-            Field<ListGraphType<DashboardDataInterface>>(
+            Field<ListGraphType<DashboardDataUnion>>(
                 "dashboardData",
                 resolve: ctx => contextServiceLocator.DashboardDataRepository.GetAll(ctx.Source.Id)
             );
@@ -65,9 +57,6 @@ namespace Netatmo.Dashboard.Api.GraphQL
             Field(x => x.BatteryVp);
             Field(x => x.BatteryPercent);
             Field<ModuleDeviceTypeEnum>("type", resolve: ctx => ctx.Source.Type);
-
-            Interface<DeviceInterface>();
-            IsTypeOf = obj => obj is ModuleDevice;
         }
     }
 }

@@ -80,10 +80,10 @@ namespace Netatmo.Dashboard.Api
             services.AddSingleton<NetatmoQuery>();
             services.AddSingleton<StationType>();
             services.AddSingleton<CountryType>();
-            services.AddSingleton<DeviceInterface>();
+            services.AddSingleton<DeviceUnion>();
             services.AddSingleton<MainDeviceType>();
             services.AddSingleton<ModuleDeviceType>();
-            services.AddSingleton<DashboardDataInterface>();
+            services.AddSingleton<DashboardDataUnion>();
             services.AddSingleton<MainDashboardDataType>();
             services.AddSingleton<OutdoorDashboardDataType>();
             services.AddSingleton<WindGaugeDashboardDataType>();

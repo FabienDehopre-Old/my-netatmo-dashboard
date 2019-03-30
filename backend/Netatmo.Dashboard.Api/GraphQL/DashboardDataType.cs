@@ -4,15 +4,15 @@ using Netatmo.Dashboard.Api.Models;
 
 namespace Netatmo.Dashboard.Api.GraphQL
 {
-    public class DashboardDataInterface : InterfaceGraphType<DashboardData>
+    public class DashboardDataUnion : UnionGraphType
     {
-        public DashboardDataInterface()
+        public DashboardDataUnion()
         {
-            Name = "DashboardData";
-
-            Field(x => x.Id);
-            Field(x => x.TimeUtc);
-            Field<DeviceInterface>("device");
+            //Type<MainDashboardDataType>();
+            Type<OutdoorDashboardDataType>();
+            Type<WindGaugeDashboardDataType>();
+            Type<RainGaugeDashboardDataType>();
+            Type<IndoorDashboardDataType>();
         }
     }
 
@@ -24,7 +24,7 @@ namespace Netatmo.Dashboard.Api.GraphQL
 
             Field(x => x.Id);
             Field(x => x.TimeUtc);
-            Field<DeviceInterface>(
+            Field<MainDeviceType>(
                 "device",
                 resolve: ctx => contextServiceLocator.DeviceRepository.GetOne(ctx.Source.DeviceId),
                 description: "Device from which the data come from"
@@ -41,9 +41,6 @@ namespace Netatmo.Dashboard.Api.GraphQL
             Field(x => x.CO2).Name("co2");
             Field(x => x.Humidity);
             Field(x => x.Noise);
-
-            Interface<DashboardDataInterface>();
-            IsTypeOf = obj => obj is MainDashboardData;
         }
     }
 
@@ -55,7 +52,7 @@ namespace Netatmo.Dashboard.Api.GraphQL
 
             Field(x => x.Id);
             Field(x => x.TimeUtc);
-            Field<DeviceInterface>(
+            Field<ModuleDeviceType>(
                 "device",
                 resolve: ctx => contextServiceLocator.DeviceRepository.GetOne(ctx.Source.DeviceId),
                 description: "Device from which the data come from"
@@ -67,9 +64,6 @@ namespace Netatmo.Dashboard.Api.GraphQL
             Field(x => x.TemperatureMaxTimestamp);
             Field<TrendEnum>("temperatureTrend", resolve: ctx => ctx.Source.TemperatureTrend);
             Field(x => x.Humidity);
-
-            Interface<DashboardDataInterface>();
-            IsTypeOf = obj => obj is OutdoorDashboardData;
         }
     }
 
@@ -81,7 +75,7 @@ namespace Netatmo.Dashboard.Api.GraphQL
 
             Field(x => x.Id);
             Field(x => x.TimeUtc);
-            Field<DeviceInterface>(
+            Field<ModuleDeviceType>(
                 "device",
                 resolve: ctx => contextServiceLocator.DeviceRepository.GetOne(ctx.Source.DeviceId),
                 description: "Device from which the data come from"
@@ -90,9 +84,6 @@ namespace Netatmo.Dashboard.Api.GraphQL
             Field(x => x.WindAngle);
             Field(x => x.GustStrength);
             Field(x => x.GustAngle);
-
-            Interface<DashboardDataInterface>();
-            IsTypeOf = obj => obj is WindGaugeDashboardData;
         }
     }
 
@@ -104,7 +95,7 @@ namespace Netatmo.Dashboard.Api.GraphQL
 
             Field(x => x.Id);
             Field(x => x.TimeUtc);
-            Field<DeviceInterface>(
+            Field<ModuleDeviceType>(
                 "device",
                 resolve: ctx => contextServiceLocator.DeviceRepository.GetOne(ctx.Source.DeviceId),
                 description: "Device from which the data come from"
@@ -112,9 +103,6 @@ namespace Netatmo.Dashboard.Api.GraphQL
             Field(x => x.Rain);
             Field(x => x.Sum1H);
             Field(x => x.Sum24H);
-
-            Interface<DashboardDataInterface>();
-            IsTypeOf = obj => obj is RainGaugeDashboardData;
         }
     }
 
@@ -126,7 +114,7 @@ namespace Netatmo.Dashboard.Api.GraphQL
 
             Field(x => x.Id);
             Field(x => x.TimeUtc);
-            Field<DeviceInterface>(
+            Field<ModuleDeviceType>(
                 "device",
                 resolve: ctx => contextServiceLocator.DeviceRepository.GetOne(ctx.Source.DeviceId),
                 description: "Device from which the data come from"
@@ -139,9 +127,6 @@ namespace Netatmo.Dashboard.Api.GraphQL
             Field<TrendEnum>("temperatureTrend", resolve: ctx => ctx.Source.TemperatureTrend);
             Field(x => x.CO2).Name("co2");
             Field(x => x.Humidity);
-
-            Interface<DashboardDataInterface>();
-            IsTypeOf = obj => obj is IndoorDashboardData;
         }
     }
 }

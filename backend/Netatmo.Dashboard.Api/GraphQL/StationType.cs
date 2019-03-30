@@ -24,7 +24,7 @@ namespace Netatmo.Dashboard.Api.GraphQL
             Field(x => x.Longitude);
             Field(x => x.Timezone);
             Field(x => x.StaticMap);
-            Field<ListGraphType<DeviceInterface>>(
+            Field<ListGraphType<DeviceUnion>>(
                 "devices",
                 arguments: new QueryArguments(new QueryArgument<IdGraphType> { Name = "id" }),
                 resolve: ctx => contextServiceLocator.DeviceRepository.GetAll(ctx.Source.Id)
