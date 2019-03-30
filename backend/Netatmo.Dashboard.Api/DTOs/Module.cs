@@ -1,13 +1,16 @@
-﻿using System.Runtime.Serialization;
+﻿using JsonSubTypes;
+using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
 namespace Netatmo.Dashboard.Api.DTOs
 {
     [DataContract]
-    [KnownType(typeof(OutdoorModule))]
-    [KnownType(typeof(WindGaugeModule))]
-    [KnownType(typeof(RainGaugeModule))]
-    [KnownType(typeof(IndoorModule))]
-    public abstract class Module
+    [JsonConverter(typeof(JsonSubtypes), "Type")]
+    [JsonSubtypes.KnownSubType(typeof(OutdoorModule), ModuleType.Outdoor)]
+    [JsonSubtypes.KnownSubType(typeof(WindGaugeModule), ModuleType.WindGauge)]
+    [JsonSubtypes.KnownSubType(typeof(RainGaugeModule), ModuleType.RainGauge)]
+    [JsonSubtypes.KnownSubType(typeof(IndoorModule), ModuleType.Indoor)]
+    public class Module
     {
         [DataMember(Name = "_id")]
         public string Id { get; set; }

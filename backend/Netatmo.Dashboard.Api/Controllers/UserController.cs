@@ -48,7 +48,7 @@ namespace Netatmo.Dashboard.Api.Controllers
                 user.PressureUnit,
                 user.Unit,
                 user.WindUnit,
-                Enabled = !string.IsNullOrWhiteSpace(user.AccessToken)
+                Enabled = !string.IsNullOrWhiteSpace(user.UpdateJobId)
                 // TODO: add more data to user profile
             });
         }
