@@ -32,7 +32,11 @@ namespace Netatmo.Dashboard.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+#if DEBUG
             services.AddDbContext<NetatmoDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")).EnableSensitiveDataLogging().EnableDetailedErrors());
+#else
+            services.AddDbContext<NetatmoDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
+#endif
 
             services.AddCors(options => 
             {
