@@ -3,15 +3,15 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Auth0.ManagementApi;
-using Auth0.ManagementApi.Models;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Netatmo.Dashboard.Tasks;
+using Netatmo.Dashboard.Core.Options;
+using Netatmo.Dashboard.Data;
 using Netatmo.Dashboard.Api.DTOs;
-using Netatmo.Dashboard.Api.Hangfire;
-using Netatmo.Dashboard.Api.Options;
 
 namespace Netatmo.Dashboard.Api.Controllers
 {
@@ -60,7 +60,7 @@ namespace Netatmo.Dashboard.Api.Controllers
             var user = await db.Users.SingleOrDefaultAsync(u => u.Uid == uid);
             if (user == null)
             {
-                user = new Models.User
+                user = new Core.Models.User
                 {
                     Uid = uid,
                 };
@@ -106,7 +106,7 @@ namespace Netatmo.Dashboard.Api.Controllers
 
                 BackgroundJob.Enqueue<NetatmoTasks>(x => x.FetchAndUpdate(user.Uid));
                 var jobId = $"fetch-update-{Guid.NewGuid()}";
-                RecurringJob.AddOrUpdate<NetatmoTasks>(jobId, x => x.FetchAndUpdate(user.Uid), Cron.MinuteInterval(15));
+                RecurringJob.AddOrUpdate<NetatmoTasks>(jobId, x => x.FetchAndUpdate(user.Uid), "*/15 * * * *");
                 user.UpdateJobId = jobId;
             }
             else

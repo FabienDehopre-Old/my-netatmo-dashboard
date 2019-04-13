@@ -10,11 +10,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Netatmo.Dashboard.Api.GraphQL;
-using Netatmo.Dashboard.Api.Hangfire;
-using Netatmo.Dashboard.Api.Helpers;
-using Netatmo.Dashboard.Api.Options;
-using Netatmo.Dashboard.Api.Repositories;
+using Netatmo.Dashboard.Core.Data;
+using Netatmo.Dashboard.Core.Options;
+using Netatmo.Dashboard.Data;
+using Netatmo.Dashboard.Data.Repositories;
+using Netatmo.Dashboard.GraphQL;
+using Netatmo.Dashboard.GraphQL.Helpers;
+using Netatmo.Dashboard.Tasks;
 using System;
 using System.Net.Http;
 

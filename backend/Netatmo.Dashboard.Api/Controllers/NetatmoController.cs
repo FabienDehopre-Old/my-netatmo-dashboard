@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Netatmo.Dashboard.Api.DTOs;
-using Netatmo.Dashboard.Api.Options;
+using Netatmo.Dashboard.Core.Options;
+using Netatmo.Dashboard.Data;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -62,7 +63,7 @@ namespace Netatmo.Dashboard.Api.Controllers
             using (var response = await httpClient.PostAsync("https://api.netatmo.com/oauth2/token", new FormUrlEncodedContent(data)))
             {
                 response.EnsureSuccessStatusCode();
-                var authorization = await response.Content.ReadAsAsync<DTOs.Authorization>();
+                var authorization = await response.Content.ReadAsAsync<Core.DTOs.Authorization>();
                 user.AccessToken = authorization.AccessToken;
                 user.RefreshToken = authorization.RefreshToken;
                 user.ExpiresAt = DateTime.Now.AddSeconds(authorization.ExpiresIn);
