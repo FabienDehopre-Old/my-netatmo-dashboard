@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 
 namespace Netatmo.Dashboard.Data.Repositories
@@ -16,11 +17,11 @@ namespace Netatmo.Dashboard.Data.Repositories
 
         protected string GetCurrentUserId()
         {
+            return httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)
 #if DEBUG
-            return "auth0|5c3369d9b171c101904570ca";
-#else
-            return httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                ?? "auth0|5c3369d9b171c101904570ca"
 #endif
+                ;
         }
     }
 }
