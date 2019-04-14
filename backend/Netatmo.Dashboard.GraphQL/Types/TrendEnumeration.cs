@@ -9,6 +9,10 @@ namespace Netatmo.Dashboard.GraphQL.Types
         {
             Name = "Trend";
             Description = "Which is the trend of the measure over time";
+
+            AddValue("UP", "The pressure or temperature has increased since the last measure", Trend.Up);
+            AddValue("DOWN", "The pressure or temperature has decreased since the last measure", Trend.Down);
+            AddValue("STABLE", "The pressure or temperature did remain the same since the last measure", Trend.Stable);
         }
     }
 }
