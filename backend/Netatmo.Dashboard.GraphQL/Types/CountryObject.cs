@@ -2,11 +2,11 @@
 using Netatmo.Dashboard.Core.Models;
 using Netatmo.Dashboard.GraphQL.Helpers;
 
-namespace Netatmo.Dashboard.GraphQL
+namespace Netatmo.Dashboard.GraphQL.Types
 {
-    public class CountryType : ObjectGraphType<Country>
+    public class CountryObject : ObjectGraphType<Country>
     {
-        public CountryType(ContextServiceLocator contextServiceLocator)
+        public CountryObject(ContextServiceLocator contextServiceLocator)
         {
             Name = "Country";
             // Description = "";
@@ -24,7 +24,7 @@ namespace Netatmo.Dashboard.GraphQL
             Field(x => x.NameFR);
             Field(x => x.NameJA);
             Field(x => x.NameIT);
-            Field<ListGraphType<StationType>>(
+            Field<ListGraphType<StationObject>>(
                 "stations",
                 arguments: new QueryArguments(new QueryArgument<IdGraphType> { Name = "id" }),
                 resolve: ctx => contextServiceLocator.StationRepository.GetAll(ctx.Source.Code)

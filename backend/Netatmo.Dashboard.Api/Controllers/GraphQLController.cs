@@ -6,7 +6,7 @@ using GraphQL.Types;
 using Microsoft.AspNetCore.Authorization;
 #endif
 using Microsoft.AspNetCore.Mvc;
-using Netatmo.Dashboard.GraphQL;
+using Netatmo.Dashboard.Api.DTOs;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

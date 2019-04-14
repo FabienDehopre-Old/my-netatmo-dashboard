@@ -1,13 +1,12 @@
 ﻿using GraphQL.Types;
 using Netatmo.Dashboard.Core.Models;
-using Netatmo.Dashboard.GraphQL;
 using Netatmo.Dashboard.GraphQL.Helpers;
 
-namespace Netatmo.Dashboard.GraphQL
+namespace Netatmo.Dashboard.GraphQL.Types
 {
-    public class StationType : ObjectGraphType<Station>
+    public class StationObject : ObjectGraphType<Station>
     {
-        public StationType(ContextServiceLocator contextServiceLocator)
+        public StationObject(ContextServiceLocator contextServiceLocator)
         {
             Name = "Station";
             // Description = "";
@@ -16,7 +15,7 @@ namespace Netatmo.Dashboard.GraphQL
             Field(x => x.Name);
             Field(x => x.Altitude);
             Field(x => x.City);
-            Field<CountryType>(
+            Field<CountryObject>(
                 "country",
                 resolve: ctx => contextServiceLocator.CountryRepository.GetOne(ctx.Source.CountryCode),
                 description: "Country in which the wheather station is located."

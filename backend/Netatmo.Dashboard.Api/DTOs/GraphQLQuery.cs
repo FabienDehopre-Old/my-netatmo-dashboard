@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace Netatmo.Dashboard.GraphQL
+namespace Netatmo.Dashboard.Api.DTOs
 {
     public class GraphQLQuery
     {

@@ -14,8 +14,9 @@ using Netatmo.Dashboard.Core.Data;
 using Netatmo.Dashboard.Core.Options;
 using Netatmo.Dashboard.Data;
 using Netatmo.Dashboard.Data.Repositories;
-using Netatmo.Dashboard.GraphQL;
 using Netatmo.Dashboard.GraphQL.Helpers;
+using Netatmo.Dashboard.GraphQL.Schemas;
+using Netatmo.Dashboard.GraphQL.Types;
 using Netatmo.Dashboard.Tasks;
 using System;
 using System.Net.Http;
@@ -83,22 +84,22 @@ namespace Netatmo.Dashboard.Api
             services.AddTransient<ICountryRepository, CountryRepository>();
             services.AddTransient<IDeviceRepository, DeviceRepository>();
             services.AddTransient<IDashboardDataRepository, DashboardDataRepository>();
-            services.AddSingleton<NetatmoQuery>();
-            services.AddSingleton<StationType>();
-            services.AddSingleton<CountryType>();
+            services.AddSingleton<QueryObject>();
+            services.AddSingleton<StationObject>();
+            services.AddSingleton<CountryObject>();
             services.AddSingleton<DeviceUnion>();
-            services.AddSingleton<MainDeviceType>();
-            services.AddSingleton<ModuleDeviceType>();
+            services.AddSingleton<MainDeviceObject>();
+            services.AddSingleton<ModuleDeviceObject>();
             services.AddSingleton<DashboardDataUnion>();
-            services.AddSingleton<MainDashboardDataType>();
-            services.AddSingleton<OutdoorDashboardDataType>();
-            services.AddSingleton<WindGaugeDashboardDataType>();
-            services.AddSingleton<RainGaugeDashboardDataType>();
-            services.AddSingleton<IndoorDashboardDataType>();
-            services.AddSingleton<ModuleDeviceTypeEnum>();
-            services.AddSingleton<TrendEnum>();
+            services.AddSingleton<MainDashboardDataObject>();
+            services.AddSingleton<OutdoorDashboardDataObject>();
+            services.AddSingleton<WindGaugeDashboardDataObject>();
+            services.AddSingleton<RainGaugeDashboardDataObject>();
+            services.AddSingleton<IndoorDashboardDataObject>();
+            services.AddSingleton<ModuleDeviceTypeEnumeration>();
+            services.AddSingleton<TrendEnumeration>();
             var sp = services.BuildServiceProvider();
-            services.AddSingleton<ISchema>(new NetatmoSchema(new FuncDependencyResolver(type => sp.GetService(type))));
+            services.AddSingleton<ISchema>(new MainSchema(new FuncDependencyResolver(type => sp.GetService(type))));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
