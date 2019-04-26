@@ -1,10 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { iif, of } from 'rxjs';
-import { filter } from 'rxjs/internal/operators/filter';
-import { switchMap } from 'rxjs/internal/operators/switchMap';
-import { tap } from 'rxjs/internal/operators/tap';
-import { mergeMap } from 'rxjs/operators';
+import { mergeMap, switchMap, tap } from 'rxjs/operators';
 
 import { AuthorizeDialogComponent } from '../../components/authorize-dialog/authorize-dialog.component';
 import { NETATMO_STATE } from '../../models/consts';
@@ -19,6 +16,8 @@ import { UserService } from '../../services/user.service';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit, OnDestroy {
+  updateJobEnabled: boolean = false;
+
   constructor(
     private readonly userService: UserService,
     private readonly netatmoService: NetatmoService,
@@ -33,11 +32,32 @@ export class HomeComponent implements OnInit, OnDestroy {
         mergeMap(result =>
           iif(
             () => result,
-            of(result),
+            this.userService.getProfile(),
             this.netatmoService.buildAuthorizeUrl()
           )
         ),
-        filter(isAuthorizeUrl),
+        mergeMap(result =>
+          iif(
+            () => isAuthorizeUrl(result),
+            of(result).pipe(
+              tap(authorizeUrl => sessionStorage.setItem(NETATMO_STATE, authorizeUrl.state)),
+              switchMap(authorizeUrl =>
+                this.matDialog
+                  .open(AuthorizeDialogComponent, {
+                    closeOnNavigation: true,
+                    data: authorizeUrl.url,
+                    disableClose: true,
+                    hasBackdrop: true,
+                    role: 'alertdialog',
+                    width: '400px',
+                  })
+                  .afterClosed()
+              )
+            ),
+            of(result)
+          )
+        ),
+        /*filter(isAuthorizeUrl),
         tap(authorizeUrl => sessionStorage.setItem(NETATMO_STATE, authorizeUrl.state)),
         switchMap(authorizeUrl =>
           this.matDialog
@@ -50,15 +70,23 @@ export class HomeComponent implements OnInit, OnDestroy {
               width: '400px',
             })
             .afterClosed()
-        ),
+        ),*/
         untilComponentDestroyed(this)
       )
       .subscribe(result => {
         if (!result) {
           this.authService.logout();
+        } else {
+          this.updateJobEnabled = result.enabled;
         }
       });
   }
 
   ngOnDestroy(): void {} // tslint:disable-line:no-empty
+
+  toggleUpdateJob(): void {
+    this.userService.toggleFetchAndUpdateJob()
+      .pipe(untilComponentDestroyed(this))
+      .subscribe(enabled => (this.updateJobEnabled = enabled));
+  }
 }
