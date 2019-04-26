@@ -1,140 +1,91 @@
-﻿using GraphiQl;
-using GraphQL;
-using GraphQL.Types;
+﻿using Boxed.AspNetCore;
+using CorrelationId;
+using GraphiQl;
+using GraphQL.Server;
+using GraphQL.Server.Ui.Playground;
+using GraphQL.Server.Ui.Voyager;
 using Hangfire;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Netatmo.Dashboard.Core.Data;
+using Netatmo.Dashboard.Api.Constants;
 using Netatmo.Dashboard.Core.Options;
-using Netatmo.Dashboard.Data;
-using Netatmo.Dashboard.Data.Repositories;
-using Netatmo.Dashboard.GraphQL.Helpers;
 using Netatmo.Dashboard.GraphQL.Schemas;
-using Netatmo.Dashboard.GraphQL.Types;
-using Netatmo.Dashboard.Tasks;
 using System;
-using System.Net.Http;
 
 namespace Netatmo.Dashboard.Api
 {
-    public class Startup
+    public class Startup : IStartup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IConfiguration configuration;
+        private readonly IHostingEnvironment hostingEnvironment;
+
+        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
-            Configuration = configuration;
+            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
         }
 
-        public IConfiguration Configuration { get; }
+        public IServiceProvider ConfigureServices(IServiceCollection services) =>
+            services
+            .AddCorrelationIdFluent()
+            .AddCustomCaching()
+            .AddCustomOptions(configuration)
+            .AddCustomRouting()
+            .AddCustomResponseCompression()
+            .AddCustomStrictTransportSecurity()
+            .AddCustomHealthChecks()
+            .AddHttpContextAccessor()
+            .AddMvcCore()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddAuthorization()
+                .AddJsonFormatters()
+                .AddCustomJsonOptions(hostingEnvironment)
+                .AddCustomCors(configuration)
+                .AddCustomMvcOptions(hostingEnvironment)
+            .Services
+            .AddCustomGraphQL(hostingEnvironment)
+            .AddCustomGraphQLAuthorization()
+            .AddProjectRepositories()
+            .AddProjectSchema()
+            .AddProjectDbContext(configuration)
+            .AddHangfire(config => config.UseSqlServerStorage(configuration.GetConnectionString("Default")))
+            .AddCustomAuthentication(configuration.GetSection("Auth0").Get<Auth0Options>())
+            .BuildServiceProvider();
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-#if DEBUG
-            services.AddDbContext<NetatmoDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")).EnableSensitiveDataLogging().EnableDetailedErrors());
-#else
-            services.AddDbContext<NetatmoDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
-#endif
-
-            services.AddCors(options => 
-            {
-                var corsOptions = Configuration.GetSection("Cors").Get<CorsOptions>();
-                options.AddDefaultPolicy(
-                    builder => builder.AllowCredentials()
-                                      .WithOrigins(corsOptions.AllowedOrigins)
-                                      .SetIsOriginAllowedToAllowWildcardSubdomains()
-                                      .WithMethods(corsOptions.AllowedMethods)
-                                      .WithHeaders(corsOptions.AllowedHeaders)
-                );
-            });
-            services.AddHttpContextAccessor();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2); 
-            services.AddHangfire(config => config.UseSqlServerStorage(Configuration.GetConnectionString("Default")));
-
-            var auth0Options = Configuration.GetSection("Auth0").Get<Auth0Options>();
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
-            {
-                options.Authority = $"https://{auth0Options.Domain}/";
-                options.Audience = auth0Options.ApiIdentifier;
-            });
-
-            //services.AddAuthorization(options =>
-            //{
-            //    options.AddPolicy("read:values", policy => policy.Requirements.Add(new HasScopeRequirement("read:values", $"https://{auth0Options.Domain}/")));
-            //});
-
-            services.Configure<NetatmoOptions>(Configuration.GetSection("Netatmo"));
-            services.Configure<Auth0Options>(Configuration.GetSection("Auth0"));
-
-            services.AddSingleton<HttpClient>();
-            services.AddTransient<NetatmoTasks>();
-            services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
-            services.AddSingleton<ContextServiceLocator>();
-            services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
-            services.AddTransient<IStationRepository, StationRepository>();
-            services.AddTransient<ICountryRepository, CountryRepository>();
-            services.AddTransient<IDeviceRepository, DeviceRepository>();
-            services.AddTransient<IDashboardDataRepository, DashboardDataRepository>();
-            services.AddSingleton<QueryObject>();
-            services.AddSingleton<StationObject>();
-            services.AddSingleton<CountryObject>();
-            services.AddSingleton<DeviceUnion>();
-            services.AddSingleton<MainDeviceObject>();
-            services.AddSingleton<ModuleDeviceObject>();
-            services.AddSingleton<DashboardDataUnion>();
-            services.AddSingleton<MainDashboardDataObject>();
-            services.AddSingleton<OutdoorDashboardDataObject>();
-            services.AddSingleton<WindGaugeDashboardDataObject>();
-            services.AddSingleton<RainGaugeDashboardDataObject>();
-            services.AddSingleton<IndoorDashboardDataObject>();
-            services.AddSingleton<ModuleDeviceTypeEnumeration>();
-            services.AddSingleton<TrendEnumeration>();
-            var sp = services.BuildServiceProvider();
-            services.AddSingleton<ISchema>(new MainSchema(new FuncDependencyResolver(type => sp.GetService(type))));
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app,
-                              IHostingEnvironment env,
-                              IServiceProvider serviceProvider)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
-
-#if DEBUG
-            app.UseGraphiQl();
-#endif
-
-            GlobalConfiguration.Configuration.UseActivator(new HangfireActivator(serviceProvider));
-            app.UseHangfireDashboard(options: new DashboardOptions
-            {
-#if !DEBUG
-                Authorization = new[] { new AuthorizationFilter($"https://{Configuration["Auth0:Domain"]}/") },
-#endif
-                AppPath = env.IsDevelopment() ? "https://localhost:4200" : "TODO"
-            });
-            app.UseHangfireServer();
-
-            app.UseCors();
-            app.UseAuthentication();
-            app.UseHttpsRedirection();
-            app.UseMvc();
-        }
+        public void Configure(IApplicationBuilder application) =>
+            application
+                // Pass a GUID in a X-Correlation-ID HTTP header to set the HttpContext.TraceIdentifier.
+                // UpdateTraceIdentifier must be false due to a bug. See https://github.com/aspnet/AspNetCore/issues/5144
+                .UseCorrelationId(new CorrelationIdOptions { UpdateTraceIdentifier = false })
+                .UseForwardedHeaders()
+                .UseResponseCompression()
+                .UseCors(CorsPolicyName.AllowAny)
+                .UseIfElse(
+                    hostingEnvironment.IsDevelopment(),
+                    x => x.UseDeveloperErrorPages(),
+                    x => x.UseHsts())
+                .UseHealthChecks("/status")
+                .UseHealthChecks("/status/self", new HealthCheckOptions { Predicate = _ => false })
+                .UseStaticFilesWithCacheControl()
+                .UseWebSockets()
+                // Use the GraphQL subscriptions in the specified schema and make them available at /graphql.
+                .UseGraphQLWebSockets<MainSchema>()
+                // Use the specified GraphQL schema and make them available at /graphql.
+                .UseGraphQL<MainSchema>()
+                .UseIf(
+                    hostingEnvironment.IsDevelopment(),
+                    x => x
+                        // Add the GraphQL Playground UI to try out the GraphQL API at /.
+                        .UseGraphQLPlayground(new GraphQLPlaygroundOptions() { Path = "/playground" })
+                        // Add the GraphQL Voyager UI to let you navigate your GraphQL API as a spider graph at /voyager.
+                        .UseGraphQLVoyager(new GraphQLVoyagerOptions() { Path = "/voyager" }))
+                .UseHangfire(hostingEnvironment)
+                .UseAuthentication()
+                .UseHttpsRedirection()
+                .UseMvc();
     }
 }

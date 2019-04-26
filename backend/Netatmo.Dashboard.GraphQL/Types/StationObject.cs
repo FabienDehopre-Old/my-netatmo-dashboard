@@ -15,11 +15,11 @@ namespace Netatmo.Dashboard.GraphQL.Types
             Field(x => x.Name);
             Field(x => x.Altitude);
             Field(x => x.City);
-            Field<CountryObject>(
-                "country",
-                resolve: ctx => contextServiceLocator.CountryRepository.GetOne(ctx.Source.CountryCode),
-                description: "Country in which the wheather station is located."
-            );
+            //Field<CountryObject>(
+            //    "country",
+            //    resolve: ctx => contextServiceLocator.CountryRepository.GetOne(ctx.Source.CountryCode),
+            //    description: "Country in which the wheather station is located."
+            //);
             Field(x => x.Latitude);
             Field(x => x.Longitude);
             Field(x => x.Timezone);

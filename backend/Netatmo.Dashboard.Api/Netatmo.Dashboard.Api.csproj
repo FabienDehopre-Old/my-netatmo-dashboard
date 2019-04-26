@@ -10,8 +10,14 @@
     <PackageReference Include="Auth0.ManagementApi" Version="6.0.0" />
     <PackageReference Include="Boxed.AspNetCore" Version="3.2.0" />
     <PackageReference Include="Boxed.AspNetCore.Swagger" Version="5.0.0" />
+    <PackageReference Include="CorrelationId" Version="2.1.0" />
     <PackageReference Include="GraphiQL" Version="1.2.0" />
     <PackageReference Include="GraphQL" Version="2.4.0" />
+    <PackageReference Include="GraphQL.Authorization" Version="2.1.29" />
+    <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="3.4.0" />
+    <PackageReference Include="GraphQL.Server.Transports.WebSockets" Version="3.4.0" />
+    <PackageReference Include="GraphQL.Server.Ui.Playground" Version="3.4.0" />
+    <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="3.4.0" />
     <PackageReference Include="Hangfire" Version="1.7.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.2.0" />
