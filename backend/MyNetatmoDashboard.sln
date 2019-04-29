@@ -5,13 +5,21 @@ VisualStudioVersion = 16.0.28705.295
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Netatmo.Dashboard.Api", "Netatmo.Dashboard.Api\Netatmo.Dashboard.Api.csproj", "{0455CF37-ED4C-4358-853E-B6B68624C04A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netatmo.Dashboard.Core", "Netatmo.Dashboard.Core\Netatmo.Dashboard.Core.csproj", "{6DEE789B-7205-44FF-B5BD-B4BCB4CFA2E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Netatmo.Dashboard.Core", "Netatmo.Dashboard.Core\Netatmo.Dashboard.Core.csproj", "{6DEE789B-7205-44FF-B5BD-B4BCB4CFA2E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netatmo.Dashboard.Data", "Netatmo.Dashboard.Data\Netatmo.Dashboard.Data.csproj", "{3B0D8652-721B-492F-AC35-B1F70E183A71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Netatmo.Dashboard.Data", "Netatmo.Dashboard.Data\Netatmo.Dashboard.Data.csproj", "{3B0D8652-721B-492F-AC35-B1F70E183A71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netatmo.Dashboard.Tasks", "Netatmo.Dashboard.Tasks\Netatmo.Dashboard.Tasks.csproj", "{7F89D25F-AF4B-49B3-8DEB-B66BAEAF43E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Netatmo.Dashboard.Tasks", "Netatmo.Dashboard.Tasks\Netatmo.Dashboard.Tasks.csproj", "{7F89D25F-AF4B-49B3-8DEB-B66BAEAF43E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netatmo.Dashboard.GraphQL", "Netatmo.Dashboard.GraphQL\Netatmo.Dashboard.GraphQL.csproj", "{7DC29433-AC6C-4131-9475-0CEEFF604DC9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Netatmo.Dashboard.GraphQL", "Netatmo.Dashboard.GraphQL\Netatmo.Dashboard.GraphQL.csproj", "{7DC29433-AC6C-4131-9475-0CEEFF604DC9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{93D2B97E-814B-4A83-A359-A2DA6EEE6031}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{757CBB53-A413-4357-833E-A282805BB5C2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{3E3D175A-3D82-4EA6-8066-7D5127088467}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{06702E84-4E9C-452D-BC78-1C50BD81359E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
