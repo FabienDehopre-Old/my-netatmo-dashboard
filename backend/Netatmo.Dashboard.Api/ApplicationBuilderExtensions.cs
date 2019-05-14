@@ -3,11 +3,9 @@ using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Netatmo.Dashboard.Api.Constants;
+using Netatmo.Dashboard.Api.Hangfire;
 using Netatmo.Dashboard.Api.Options;
-using Netatmo.Dashboard.Core.Options;
-using Netatmo.Dashboard.Tasks;
 using System;
 using System.Linq;
 
@@ -23,7 +21,7 @@ namespace Netatmo.Dashboard.Api
             application
                 // When a database error occurs, displays a detailed error page with full diagnostic information. It is
                 // unsafe to use this in production. Uncomment this if using a database.
-                // .UseDatabaseErrorPage(DatabaseErrorPageOptions.ShowAll);
+                .UseDatabaseErrorPage()
                 // When an error occurs, displays a detailed error page with full diagnostic information.
                 // See http://docs.asp.net/en/latest/fundamentals/diagnostics.html
                 .UseDeveloperExceptionPage();
@@ -54,7 +52,7 @@ namespace Netatmo.Dashboard.Api
 
         public static IApplicationBuilder UseHangfire(this IApplicationBuilder application, IHostingEnvironment hostingEnvironment)
         {
-            var auth0Options = application.ApplicationServices.GetRequiredService<IOptions<Auth0Options>>().Value;
+            var auth0Options = application.ApplicationServices.GetRequiredService<Auth0Options>();
             GlobalConfiguration.Configuration.UseActivator(new HangfireActivator(application.ApplicationServices));
             return application
                 .UseIfElse(

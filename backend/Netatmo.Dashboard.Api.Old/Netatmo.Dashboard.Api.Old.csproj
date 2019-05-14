@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <UserSecretsId>16027342-87f4-435c-a697-6593420fb2a6</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Auth0.ManagementApi" Version="6.0.0" />
+    <PackageReference Include="Boxed.AspNetCore" Version="3.2.0" />
+    <PackageReference Include="Boxed.AspNetCore.Swagger" Version="5.0.0" />
+    <PackageReference Include="CorrelationId" Version="2.1.0" />
+    <PackageReference Include="GraphiQL" Version="1.2.0" />
+    <PackageReference Include="GraphQL" Version="2.4.0" />
+    <PackageReference Include="GraphQL.Authorization" Version="2.1.29" />
+    <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="3.4.0" />
+    <PackageReference Include="GraphQL.Server.Transports.WebSockets" Version="3.4.0" />
+    <PackageReference Include="GraphQL.Server.Ui.Playground" Version="3.4.0" />
+    <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="3.4.0" />
+    <PackageReference Include="Hangfire" Version="1.7.1" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="2.2.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.2.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+    <PackageReference Include="Sentry.AspNetCore" Version="1.1.2" />
+    <PackageReference Include="Sentry.Serilog" Version="1.1.2" />
+    <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
+    <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="3.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Netatmo.Dashboard.Core\Netatmo.Dashboard.Core.csproj" />
+    <ProjectReference Include="..\Netatmo.Dashboard.Data\Netatmo.Dashboard.Data.csproj" />
+    <ProjectReference Include="..\Netatmo.Dashboard.GraphQL\Netatmo.Dashboard.GraphQL.csproj" />
+    <ProjectReference Include="..\Netatmo.Dashboard.Tasks\Netatmo.Dashboard.Tasks.csproj" />
+  </ItemGroup>
+
+</Project>

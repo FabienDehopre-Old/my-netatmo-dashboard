@@ -1,4 +1,4 @@
-﻿using Netatmo.Dashboard.Application.DTOs;
+﻿using Netatmo.Dashboard.Application.Netatmo.DTOs;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,9 +6,9 @@ namespace Netatmo.Dashboard.Application.Interfaces
 {
     public interface INetatmoService
     {
-        AuthorizeUrl BuildAuthorizationUrl(string returnUrl);
-        Task<Authorization> ExchangeCodeForAccessToken(ExchangeCode exchangeCode, CancellationToken cancellationToken = default);
-        Task<Authorization> RefreshToken(string refreshToken, CancellationToken cancellationToken = default);
-        Task<WeatherData> GetStationData(string accessToken, CancellationToken cancellationToken = default);
+        AuthorizeUrlDto BuildAuthorizationUrl(string returnUrl);
+        Task<AuthorizationDto> ExchangeCodeForAccessToken(ExchangeCodeDto exchangeCode, CancellationToken cancellationToken = default);
+        Task<AuthorizationDto> RefreshToken(string refreshToken, CancellationToken cancellationToken = default);
+        Task<WeatherDataDto> GetStationData(string accessToken, CancellationToken cancellationToken = default);
     }
 }

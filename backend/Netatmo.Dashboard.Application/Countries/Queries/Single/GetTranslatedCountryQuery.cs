@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using Netatmo.Dashboard.Application.Countries.Queries.DTOs;
+using Netatmo.Dashboard.Application.Countries.DTOs;
 using Netatmo.Dashboard.Application.Exceptions;
 using Netatmo.Dashboard.Application.Interfaces;
 using Netatmo.Dashboard.Domain.Entities;

@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Netatmo.Dashboard.Application.Countries.Queries.DTOs;
+using Netatmo.Dashboard.Application.Countries.DTOs;
 using Netatmo.Dashboard.Application.Interfaces;
 using System;
 using System.Collections.Generic;

@@ -1,20 +1,20 @@
-﻿using Boxed.AspNetCore;
-using CorrelationId;
-using GraphiQl;
-using GraphQL.Server;
-using GraphQL.Server.Ui.Playground;
-using GraphQL.Server.Ui.Voyager;
-using Hangfire;
+﻿using System;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using FluentValidation.AspNetCore;
+using Netatmo.Dashboard.Application.Users.Queries;
+using AutoMapper;
+using Netatmo.Dashboard.Application.Infrastructure.AutoMapper;
+using System.Reflection;
+using CorrelationId;
 using Netatmo.Dashboard.Api.Constants;
-using Netatmo.Dashboard.Core.Options;
-using Netatmo.Dashboard.GraphQL.Schemas;
-using System;
+using Boxed.AspNetCore;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using GraphQL.Server.Ui.Playground;
+using GraphQL.Server.Ui.Voyager;
 
 namespace Netatmo.Dashboard.Api
 {
@@ -45,15 +45,13 @@ namespace Netatmo.Dashboard.Api
                 .AddJsonFormatters()
                 .AddCustomJsonOptions(hostingEnvironment)
                 .AddCustomCors(configuration)
-                .AddCustomMvcOptions(hostingEnvironment)
+                .AddCustomMvcOptions()
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<GetUserByUidQueryValidator>())
             .Services
-            .AddCustomGraphQL(hostingEnvironment)
-            .AddCustomGraphQLAuthorization()
-            .AddProjectRepositories()
-            .AddProjectSchema()
             .AddProjectDbContext(configuration)
-            .AddHangfire(config => config.UseSqlServerStorage(configuration.GetConnectionString("Default")))
-            .AddCustomAuthentication(configuration.GetSection("Auth0").Get<Auth0Options>())
+            .AddProjectMediatR()
+            .AddAutoMapper(typeof(AutoMapperProfile).GetTypeInfo().Assembly)
+            .ConfigureApiBehavior()
             .BuildServiceProvider();
 
         public void Configure(IApplicationBuilder application) =>
@@ -63,7 +61,7 @@ namespace Netatmo.Dashboard.Api
                 .UseCorrelationId(new CorrelationIdOptions { UpdateTraceIdentifier = false })
                 .UseForwardedHeaders()
                 .UseResponseCompression()
-                .UseCors(CorsPolicyName.AllowAny)
+                .UseCors(CorsPolicyName.AllowAngularApp)
                 .UseIfElse(
                     hostingEnvironment.IsDevelopment(),
                     x => x.UseDeveloperErrorPages(),
@@ -73,9 +71,9 @@ namespace Netatmo.Dashboard.Api
                 .UseStaticFilesWithCacheControl()
                 .UseWebSockets()
                 // Use the GraphQL subscriptions in the specified schema and make them available at /graphql.
-                .UseGraphQLWebSockets<MainSchema>()
+                // .UseGraphQLWebSockets<MainSchema>()
                 // Use the specified GraphQL schema and make them available at /graphql.
-                .UseGraphQL<MainSchema>()
+                // .UseGraphQL<MainSchema>()
                 .UseIf(
                     hostingEnvironment.IsDevelopment(),
                     x => x

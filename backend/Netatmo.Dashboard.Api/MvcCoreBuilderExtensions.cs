@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Netatmo.Dashboard.Api.Constants;
 using Netatmo.Dashboard.Api.Options;
-using Netatmo.Dashboard.Core.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -22,14 +21,14 @@ namespace Netatmo.Dashboard.Api
                     // Create named CORS policies here which you can consume using application.UseCors("PolicyName")
                     // or a [EnableCors("PolicyName")] attribute on your controller or action.
                     var corsOptions = configuration.GetSection("Cors").Get<CorsOptions>();
-                    options.AddPolicy(
-                        CorsPolicyName.AllowAny,
-                        x => x
-                            .AllowCredentials()
-                            .WithOrigins(corsOptions.AllowedOrigins)
-                            .SetIsOriginAllowedToAllowWildcardSubdomains()
-                            .WithMethods(corsOptions.AllowedMethods)
-                            .WithHeaders(corsOptions.AllowedHeaders));
+                options.AddPolicy(
+                    CorsPolicyName.AllowAngularApp,
+                    x => x
+                        .AllowCredentials()
+                        .WithOrigins(corsOptions.AllowedOrigins)
+                        .SetIsOriginAllowedToAllowWildcardSubdomains()
+                        .WithMethods("HEAD", "GET", "POST")
+                        .WithHeaders("Accept", "Authorization", "Content-Type"));
                 });
 
         /// <summary>
@@ -55,9 +54,7 @@ namespace Netatmo.Dashboard.Api
                     options.SerializerSettings.Converters.Add(new StringEnumConverter());
                 });
 
-        public static IMvcCoreBuilder AddCustomMvcOptions(
-            this IMvcCoreBuilder builder,
-            IHostingEnvironment hostingEnvironment) =>
+        public static IMvcCoreBuilder AddCustomMvcOptions(this IMvcCoreBuilder builder) =>
             builder.AddMvcOptions(
                 options =>
                 {

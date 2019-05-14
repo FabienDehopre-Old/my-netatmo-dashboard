@@ -13,13 +13,13 @@ namespace Netatmo.Dashboard.Api
             WebHost.CreateDefaultBuilder(args)
                 .UseSerilog((context, config) =>
                     config.Enrich.FromLogContext()
-                          .MinimumLevel.Debug()
-                          .WriteTo.Console()
-                          .WriteTo.Sentry(sentryOptions =>
-                          {
-                              sentryOptions.MinimumBreadcrumbLevel = LogEventLevel.Debug;
-                              sentryOptions.MinimumEventLevel = LogEventLevel.Warning;
-                          })
+                        .MinimumLevel.Debug()
+                        .WriteTo.ColoredConsole()
+                        .WriteTo.Sentry(sentryOptions =>
+                        {
+                            sentryOptions.MinimumBreadcrumbLevel = LogEventLevel.Debug;
+                            sentryOptions.MinimumEventLevel = LogEventLevel.Warning;
+                        })
                 )
                 .UseSentry()
                 .UseStartup<Startup>()

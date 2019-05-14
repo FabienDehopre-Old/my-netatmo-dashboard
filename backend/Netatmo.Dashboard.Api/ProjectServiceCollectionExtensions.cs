@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Netatmo.Dashboard.Core.Data;
-using Netatmo.Dashboard.Data;
-using Netatmo.Dashboard.Data.Repositories;
-using Netatmo.Dashboard.GraphQL.Helpers;
-using Netatmo.Dashboard.GraphQL.Schemas;
+using Netatmo.Dashboard.Application.Infrastructure;
+using Netatmo.Dashboard.Application.Interfaces;
+using Netatmo.Dashboard.Application.Users.Queries;
+using Netatmo.Dashboard.Persistence;
+using System.Reflection;
 
 namespace Netatmo.Dashboard.Api
 {
@@ -19,27 +20,19 @@ namespace Netatmo.Dashboard.Api
     /// </remarks>
     public static class ProjectServiceCollectionExtensions
     {
-        /// <summary>
-        /// Add project data repositories.
-        /// </summary>
-        public static IServiceCollection AddProjectRepositories(this IServiceCollection services) =>
-            services
-                .AddSingleton<IStationRepository, StationRepository>()
-                .AddSingleton<ICountryRepository, CountryRepository>()
-                .AddSingleton<IDeviceRepository, DeviceRepository>()
-                .AddSingleton<IDashboardDataRepository, DashboardDataRepository>()
-                .AddSingleton<ContextServiceLocator>();
-
-        /// <summary>
-        /// Add project GraphQL schema and web socket types.
-        /// </summary>
-        public static IServiceCollection AddProjectSchema(this IServiceCollection services) =>
-            services
-                .AddSingleton<MainSchema>();
-
         public static IServiceCollection AddProjectDbContext(this IServiceCollection services, IConfiguration configuration) =>
             services
-                .AddDbContext<NetatmoDbContext>(
-                    options => options.UseSqlServer(configuration.GetConnectionString("Default"))) ;
+                .AddDbContext<INetatmoDbContext, NetatmoDbContext>(
+                    options => options.UseSqlServer(configuration.GetConnectionString("NetatmoDatabase")));
+
+        public static IServiceCollection AddProjectMediatR(this IServiceCollection service) =>
+            service
+                .AddMediatR(typeof(GetUserByUidQuery).GetTypeInfo().Assembly)
+                .AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>))
+                .AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+
+        public static IServiceCollection AddProjectSchema(this IServiceCollection services) =>
+            services;
+                // .AddSingleton<MainSchema>();
     }
 }

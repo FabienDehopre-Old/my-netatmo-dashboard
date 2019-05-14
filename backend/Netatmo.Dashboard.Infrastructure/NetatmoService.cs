@@ -7,8 +7,8 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Netatmo.Dashboard.Application.DTOs;
 using Netatmo.Dashboard.Application.Interfaces;
+using Netatmo.Dashboard.Application.Netatmo.DTOs;
 using Netatmo.Dashboard.Infrastructure.Options;
 using Authorization = Netatmo.Dashboard.Application.DTOs.Authorization;
 
@@ -27,13 +27,13 @@ namespace Netatmo.Dashboard.Infrastructure
             rng = new RNGCryptoServiceProvider();
         }
 
-        public AuthorizeUrl BuildAuthorizationUrl(string returnUrl)
+        public AuthorizeUrlDto BuildAuthorizationUrl(string returnUrl)
         {
             var state = GenerateRandomString(32);
-            return new AuthorizeUrl { Url = $"https://api.netatmo.com/oauth2/authorize?client_id={options.CurrentValue.ClientId}&redirect_uri={WebUtility.UrlEncode(returnUrl)}&scope=read_station&state={state}", State = state };
+            return new AuthorizeUrlDto { Url = $"https://api.netatmo.com/oauth2/authorize?client_id={options.CurrentValue.ClientId}&redirect_uri={WebUtility.UrlEncode(returnUrl)}&scope=read_station&state={state}", State = state };
         }
 
-        public async Task<Authorization> ExchangeCodeForAccessToken(ExchangeCode exchangeCode, CancellationToken cancellationToken = default)
+        public async Task<Authorization> ExchangeCodeForAccessToken(ExchangeCodeDto exchangeCode, CancellationToken cancellationToken = default)
         {
             var data = new Dictionary<string, string>
             {
@@ -69,7 +69,7 @@ namespace Netatmo.Dashboard.Infrastructure
             }
         }
 
-        public async Task<WeatherData> GetStationData(string accessToken, CancellationToken cancellationToken = default)
+        public async Task<WeatherDataDto> GetStationData(string accessToken, CancellationToken cancellationToken = default)
         {
             var nameValueCollection = new Dictionary<string, string>
             {
@@ -79,7 +79,7 @@ namespace Netatmo.Dashboard.Infrastructure
             using (var response = await httpClient.PostAsync("https://api.netatmo.com/api/getstationsdata", new FormUrlEncodedContent(nameValueCollection), cancellationToken))
             {
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadAsAsync<WeatherData>(cancellationToken);
+                return await response.Content.ReadAsAsync<WeatherDataDto>(cancellationToken);
             }
         }
 

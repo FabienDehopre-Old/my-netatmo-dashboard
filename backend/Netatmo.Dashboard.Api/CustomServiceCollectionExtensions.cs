@@ -1,21 +1,14 @@
 ﻿using Boxed.AspNetCore;
 using CorrelationId;
-using GraphQL;
-using GraphQL.Authorization;
 using GraphQL.Server;
-using GraphQL.Server.Internal;
-using GraphQL.Validation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Netatmo.Dashboard.Api.Constants;
 using Netatmo.Dashboard.Api.Options;
-using Netatmo.Dashboard.Core.Options;
-using Netatmo.Dashboard.GraphQL.Schemas;
+using Netatmo.Dashboard.Infrastructure.Options;
 using System.IO.Compression;
 using System.Linq;
 
@@ -133,54 +126,6 @@ namespace Netatmo.Dashboard.Api
                 // Add health checks for external dependencies here. See https://github.com/Xabaril/AspNetCore.Diagnostics.HealthChecks
                 .Services;
 
-        public static IServiceCollection AddCustomGraphQL(this IServiceCollection services, IHostingEnvironment hostingEnvironment) =>
-            services
-                // Add a way for GraphQL.NET to resolve types.
-                .AddSingleton<IDependencyResolver, GraphQLDependencyResolver>()
-                .AddGraphQL(
-                    options =>
-                    {
-                        var configuration = services
-                            .BuildServiceProvider()
-                            .GetRequiredService<IOptions<GraphQLOptions>>()
-                            .Value;
-                        // Set some limits for security, read from configuration.
-                        options.ComplexityConfiguration = configuration.ComplexityConfiguration;
-                        // Enable GraphQL metrics to be output in the response, read from configuration.
-                        options.EnableMetrics = configuration.EnableMetrics;
-                        // Show stack traces in exceptions. Don't turn this on in production.
-                        options.ExposeExceptions = hostingEnvironment.IsDevelopment();
-                    })
-                // Adds all graph types in the current assembly with a singleton lifetime.
-                .AddGraphTypes(typeof(MainSchema).Assembly)
-                // Adds ConnectionType<T>, EdgeType<T> and PageInfoType.
-                .AddRelayGraphTypes()
-                // Add a user context from the HttpContext and make it available in field resolvers.
-                .AddUserContextBuilder<GraphQLUserContextBuilder>()
-                // Add GraphQL data loader to reduce the number of calls to our repository.
-                .AddDataLoader()
-                // Add WebSockets support for subscriptions.
-                .AddWebSockets()
-                .Services;
-                //.AddTransient(typeof(IGraphQLExecuter<>), typeof(InstrumentingGraphQLExecutor<>));
-
-        /// <summary>
-        /// Add GraphQL authorization (See https://github.com/graphql-dotnet/authorization).
-        /// </summary>
-        public static IServiceCollection AddCustomGraphQLAuthorization(this IServiceCollection services) =>
-            services
-                .AddSingleton<IAuthorizationEvaluator, AuthorizationEvaluator>()
-                .AddTransient<IValidationRule, AuthorizationValidationRule>()
-                .AddSingleton(
-                    x =>
-                    {
-                        var authorizationSettings = new AuthorizationSettings();
-                        authorizationSettings.AddPolicy(
-                            AuthorizationPolicyName.Admin,
-                            y => y.RequireClaim("role", "admin"));
-                        return authorizationSettings;
-                    });
-
         public static IServiceCollection AddCustomAuthentication(this IServiceCollection services, Auth0Options auth0Options) =>
             services
                 .AddAuthentication(options =>
@@ -198,5 +143,11 @@ namespace Netatmo.Dashboard.Api
         //{
         //    options.AddPolicy("read:values", policy => policy.Requirements.Add(new HasScopeRequirement("read:values", $"https://{auth0Options.Domain}/")));
         //});
+
+        public static IServiceCollection ConfigureApiBehavior(this IServiceCollection services) =>
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
     }
 }
