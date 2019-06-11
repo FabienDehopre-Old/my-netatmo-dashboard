@@ -10,7 +10,6 @@ using Microsoft.Extensions.Options;
 using Netatmo.Dashboard.Application.Interfaces;
 using Netatmo.Dashboard.Application.Netatmo.DTOs;
 using Netatmo.Dashboard.Infrastructure.Options;
-using Authorization = Netatmo.Dashboard.Application.DTOs.Authorization;
 
 namespace Netatmo.Dashboard.Infrastructure
 {
@@ -25,6 +24,7 @@ namespace Netatmo.Dashboard.Infrastructure
             this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             this.options = options ?? throw new ArgumentNullException(nameof(options));
             rng = new RNGCryptoServiceProvider();
+            this.httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         public AuthorizeUrlDto BuildAuthorizationUrl(string returnUrl)
@@ -33,7 +33,7 @@ namespace Netatmo.Dashboard.Infrastructure
             return new AuthorizeUrlDto { Url = $"https://api.netatmo.com/oauth2/authorize?client_id={options.CurrentValue.ClientId}&redirect_uri={WebUtility.UrlEncode(returnUrl)}&scope=read_station&state={state}", State = state };
         }
 
-        public async Task<Authorization> ExchangeCodeForAccessToken(ExchangeCodeDto exchangeCode, CancellationToken cancellationToken = default)
+        public async Task<AuthorizationDto> ExchangeCodeForAccessToken(ExchangeCodeDto exchangeCode, CancellationToken cancellationToken = default)
         {
             var data = new Dictionary<string, string>
             {
@@ -48,11 +48,11 @@ namespace Netatmo.Dashboard.Infrastructure
             using (var response = await httpClient.PostAsync("https://api.netatmo.com/oauth2/token", new FormUrlEncodedContent(data), cancellationToken))
             {
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadAsAsync<Authorization>(cancellationToken);
+                return await response.Content.ReadAsAsync<AuthorizationDto>(cancellationToken);
             }
         }
 
-        public async Task<Authorization> RefreshToken(string refreshToken, CancellationToken cancellationToken = default)
+        public async Task<AuthorizationDto> RefreshToken(string refreshToken, CancellationToken cancellationToken = default)
         {
             var nameValueCollection = new Dictionary<string, string>
             {
@@ -65,7 +65,7 @@ namespace Netatmo.Dashboard.Infrastructure
             using (var response = await httpClient.PostAsync("https://api.netatmo.com/oauth2/token", new FormUrlEncodedContent(nameValueCollection), cancellationToken))
             {
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadAsAsync<Authorization>(cancellationToken);
+                return await response.Content.ReadAsAsync<AuthorizationDto>(cancellationToken);
             }
         }
 

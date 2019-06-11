@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using System.Text.RegularExpressions;
 
 namespace Netatmo.Dashboard.Application.Users.Commands.UpdateUser
 {
